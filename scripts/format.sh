@@ -1,4 +1,4 @@
 #!/bin/sh -ex
 
-black python_project_template tests scripts
-ruff python_project_template tests scripts --fix
+black hudson tests scripts
+ruff hudson tests scripts --fix

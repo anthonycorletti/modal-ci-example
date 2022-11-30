@@ -1,6 +1,6 @@
 import os
 
-from python_project_template.main import foo
+from hudson.main import foo
 
 
 def test_timezone() -> None:

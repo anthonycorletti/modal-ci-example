@@ -6,10 +6,10 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "python_project_template"
-authors = [{name = "Anthony Corletti", email = "python_project_template@example.com"}]
+name = "hudson"
+authors = [{name = "Anthony Corletti", email = "hudson@example.com"}]
 dynamic = ["version", "readme", "license"]
-description = "python_project_template"
+description = "hudson"
 requires-python = ">=3.10"
 dependencies = []
 
@@ -27,10 +27,10 @@ dev = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/anthonycorletti/python_project_template"
+Documentation = "https://github.com/anthonycorletti/hudson"
 
 [tool.setuptools.dynamic]
-version = {attr = "python_project_template.__version__"}
+version = {attr = "hudson.__version__"}
 
 [tool.ruff]
 line-length = 88

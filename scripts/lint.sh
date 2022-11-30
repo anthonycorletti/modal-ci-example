@@ -1,5 +1,5 @@
 #!/bin/sh -ex
 
-mypy python_project_template tests
-black python_project_template tests --check
-ruff python_project_template tests scripts
+mypy hudson tests
+black hudson tests --check
+ruff hudson tests scripts
