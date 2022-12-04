@@ -2,6 +2,7 @@
 source =
     hudson
     tests
+    docs_src
 
 omit =
     *__init__.py
