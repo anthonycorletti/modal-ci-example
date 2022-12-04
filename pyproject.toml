@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hudson"
-dynamic = [ "version", "license",]
+dynamic = [ "version", "readme", "license",]
 description = "hudson"
 requires-python = ">=3.10"
 dependencies = [ "fastapi>=0.88.0", "httpx>=0.23.1", "python-dotenv>=0.21.0", "structlog>=22.3.0", "typer>=0.7.0", "uvicorn>=0.20.0",]
