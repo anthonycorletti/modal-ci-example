@@ -11,4 +11,5 @@ os.environ["TZ"] = "UTC"
 app = FastAPI(title=HUDSON, version=__version__)
 
 app.include_router(routers.health_router)
-app.include_router(routers.item_router)
+app.include_router(routers.datasets_router)
+app.include_router(routers.pubsub_router)
