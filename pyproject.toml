@@ -1,21 +1,52 @@
 [build-system]
-requires = [ "setuptools>=65.0", "wheel>=0.36.2",]
+requires = [
+    "setuptools >=65.0",
+    "wheel >=0.36.2",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "hudson"
-dynamic = [ "version", "readme", "license",]
-description = "hudson"
+dynamic = [
+    "version",
+    "readme",
+    "license",
+]
+description = "Simple, secure, and scalable orchestration for apps and data on Modal."
 requires-python = ">=3.10"
-dependencies = [ "fastapi>=0.88.0", "httpx>=0.23.1", "python-dotenv>=0.21.0", "rich>=12.6.0", "structlog>=22.3.0", "typer[all]>=0.7.0", "uvicorn>=0.20.0",]
+dependencies = [
+    "datasets >=2.6.0",
+    "docarray >=0.19.1",
+    "fastapi >=0.88.0",
+    "httpx >=0.23.1",
+    "modal-client >=0.41.477",
+    "python-dotenv >=0.21.0",
+    "rich >=12.6.0",
+    "structlog >=22.3.0",
+    "typer >=0.7.0",
+    "uvicorn >=0.20.0",
+]
 [[project.authors]]
 name = "Anthony Corletti"
 email = "anthcor@gmail.com"
 
 [project.optional-dependencies]
-test = [ "pytest>=6.2.5", "coverage>=6.1.1", "pytest-cov>=3.0.0",]
-dev = [ "mypy>=0.910", "black>=21.10", "ruff>=0.0.98", "pre-commit>=2.17.0",]
-doc = [ "mkdocs>=1.1.2", "mkdocs-material>=8.1.4", "mdx-include>=1.4.1",]
+test = [
+    "pytest >=6.2.5",
+    "coverage >=6.1.1",
+    "pytest-cov >=3.0.0",
+]
+dev = [
+    "mypy >=0.991",
+    "black >=22.10.0",
+    "ruff >=0.0.166",
+    "pre-commit >=2.17.0",
+]
+doc = [
+    "mkdocs >=1.4.2",
+    "mkdocs-material >=8.5.11",
+    "mdx-include >=1.4.2",
+]
 
 [project.urls]
 Home = "https://www.github.com/anthonycorletti/hudson"
@@ -26,10 +57,25 @@ hudson = "hudson.cli.main:app"
 
 [tool.ruff]
 line-length = 88
-ignore = [ "D10", "D415",]
+ignore = [
+    "D10",
+    "D415",
+]
 target-version = "py310"
-extend-select = [ "D",]
-extend-ignore = [ "D203", "D204", "D213", "D215", "D400", "D404", "D406", "D407", "D408", "D409", "D413",]
+extend-select = [ "D" ]
+extend-ignore = [
+    "D203",
+    "D204",
+    "D213",
+    "D215",
+    "D400",
+    "D404",
+    "D406",
+    "D407",
+    "D408",
+    "D409",
+    "D413",
+]
 
 [tool.setuptools.dynamic.version]
 attr = "hudson.__version__"
