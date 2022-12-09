@@ -1,5 +1,5 @@
 site_name: Hudson
-site_description: Hudson Documentation.
+site_description: Simple, secure, and scalable orchestration for multi-modal data apps on Modal.
 site_url: https://hudson.corletti.xyz
 
 theme:
@@ -58,7 +58,7 @@ markdown_extensions:
 extra:
   # analytics:
   #   provider: google
-  #   property: UA-ABC1234567-1
+  #   property: GA-PROPERTY-ID
   social:
     - icon: fontawesome/brands/github-alt
       link: https://github.com/anthonycorletti/hudson

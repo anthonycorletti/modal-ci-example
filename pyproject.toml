@@ -25,6 +25,7 @@ dependencies = [
     "structlog >=22.3.0",
     "typer >=0.7.0",
     "uvicorn >=0.20.0",
+    "duckdb >=0.3.0",
 ]
 [[project.authors]]
 name = "Anthony Corletti"

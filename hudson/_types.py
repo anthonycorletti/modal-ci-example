@@ -1,7 +1,9 @@
 from datetime import datetime
+from typing import Dict, List
 
 from docarray.document.pydantic_model import PydanticDocumentArray
-from pydantic import BaseModel, StrictStr
+from pydantic import BaseModel, Json, StrictInt, StrictStr
+from starlette.datastructures import Headers, MutableHeaders, QueryParams
 
 
 class HealthResponse(BaseModel):
@@ -14,21 +16,21 @@ class BaseResponse(BaseModel):
     pass
 
 
-class DatasetCreateResponse(BaseResponse):
+class CreateDataResponse(BaseResponse):
     pass
 
 
-class DatasetGetResponse(BaseResponse):
+class GetDataResponse(BaseResponse):
     pass
 
 
-class DatasetCreate(BaseModel):
-    dataset: PydanticDocumentArray
+class DataArray(BaseModel):
+    data: PydanticDocumentArray
 
     class Config:
         schema_extra = {
             "example": {
-                "items": [
+                "data": [
                     {
                         "id": "1",
                         "text": "hello",
@@ -44,3 +46,19 @@ class DatasetCreate(BaseModel):
                 ]
             }
         }
+
+
+class RequestLoggerMessage(BaseModel):
+    scope: Dict
+    _stream_consumed: bool
+    _is_disconnected: bool
+    _query_params: QueryParams
+    _headers: Headers
+    _cookies: Dict
+
+
+class ResponseLoggerMessage(BaseModel):
+    status_code: StrictInt
+    body: Json
+    raw_headers: List
+    _headers: MutableHeaders
