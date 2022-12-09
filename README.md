@@ -1,11 +1,3 @@
 # Hudson ⛵️
 
-Simple, secure, and scalable orchestration for apps and data on [Modal](https://modal.com).
-
-Coming soon!
-
-notes!
-
-all oneline installs
-
-<https://corletti.xyz/cloud-mind-map>
+Simple, secure, and scalable orchestration for multi-modal data apps on [Modal](https://modal.com). Coming soon!
