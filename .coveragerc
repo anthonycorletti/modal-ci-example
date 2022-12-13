@@ -4,6 +4,10 @@ source =
     tests
     docs_src
 
+concurrency =
+    thread
+    greenlet
+
 omit =
     *__init__.py
 
