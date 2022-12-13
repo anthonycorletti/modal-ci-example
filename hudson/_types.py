@@ -16,11 +16,15 @@ class BaseResponse(BaseModel):
     pass
 
 
-class CreateDataResponse(BaseResponse):
+class CreateDatasetResponse(BaseResponse):
     pass
 
 
-class GetDataResponse(BaseResponse):
+class GetDatasetResponse(BaseResponse):
+    pass
+
+
+class DeleteDatasetResponse(BaseResponse):
     pass
 
 

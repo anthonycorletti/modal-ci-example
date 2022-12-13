@@ -1,10 +1,12 @@
 import typer
 import uvicorn
 
+from alembic import command
+from alembic.config import Config
 from hudson import __version__
-from hudson.const import APP_IMPORT_STRING
+from hudson.const import APP_IMPORT_STRING, HUDSON
 
-name = f"Hudson ⛵️ {__version__}"
+name = f"{HUDSON} {__version__}"
 
 app = typer.Typer(
     name=name,
@@ -50,6 +52,8 @@ def _server(
     ),
 ) -> None:
     """Start the Hudson server."""
+    command.upgrade(Config("alembic.ini"), "head")
+
     uvicorn.run(
         app=APP_IMPORT_STRING,
         port=port,
