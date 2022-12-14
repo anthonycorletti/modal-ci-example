@@ -93,7 +93,7 @@ async def test_get_topic_with_query(client: AsyncClient) -> None:
     )
     assert response.status_code == 200
     topic_id = response.json()["id"]
-    response = await client.get(f"/namespaces/{namespace_id}/topics?q=test")
+    response = await client.get(f"/namespaces/{namespace_id}/topics?name=tes")
     assert response.status_code == 200
     assert response.json()[0]["id"] == topic_id
     assert response.json()[0]["name"] == "test"

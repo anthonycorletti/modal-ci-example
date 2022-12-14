@@ -66,14 +66,14 @@ async def create_namespaces(
 
 @namespace_router.get("/namespaces", response_model=List[NamespaceRead])
 async def get_namespaces(
-    q: Optional[str] = None, psql: AsyncSession = Depends(psql_db)
+    name: Optional[str] = None, psql: AsyncSession = Depends(psql_db)
 ) -> List[Namespace]:
     """Get all namespaces.
 
     Returns:
         List[Namespace]: The namespaces.
     """
-    return await namespace_service.list(q=q, psql=psql)
+    return await namespace_service.list(name=name, psql=psql)
 
 
 @namespace_router.delete("/namespaces/{namespace_id}", response_model=NamespaceRead)
@@ -96,7 +96,9 @@ async def delete_namespaces(
 
 @pubsub_router.get("/namespaces/{namespace_id}/topics", response_model=List[TopicRead])
 async def get_topics(
-    namespace_id: UUID4, q: Optional[str] = None, psql: AsyncSession = Depends(psql_db)
+    namespace_id: UUID4,
+    name: Optional[str] = None,
+    psql: AsyncSession = Depends(psql_db),
 ) -> List[Topic]:
     """Get all topics in a namespace.
 
@@ -109,7 +111,7 @@ async def get_topics(
     namespace = await namespace_service.get(namespace_id=namespace_id, psql=psql)
     if namespace is None:
         raise HTTPException(status_code=400, detail="Namespace not found.")
-    return await topics_service.list(namespace_id=namespace_id, q=q, psql=psql)
+    return await topics_service.list(namespace_id=namespace_id, name=name, psql=psql)
 
 
 @pubsub_router.post("/namespaces/{namespace_id}/topics", response_model=TopicRead)
@@ -164,7 +166,7 @@ async def delete_topics(
 
 @pubsub_router.post(
     "/namespaces/{namespace_id}/topics/{topic_id}/subscriptions",
-    response_model=List[SubscriptionRead],
+    response_model=SubscriptionRead,
 )
 async def create_subscriptions(
     namespace_id: UUID4,
@@ -197,13 +199,13 @@ async def create_subscriptions(
 
 
 @pubsub_router.get(
-    "/namespaces/{namespace_id}/topics/{topic_id}/subscriptions/",
+    "/namespaces/{namespace_id}/topics/{topic_id}/subscriptions",
     response_model=List[SubscriptionRead],
 )
 async def get_subscriptions(
     namespace_id: UUID4,
     topic_id: UUID4,
-    q: Optional[str],
+    name: Optional[str] = None,
     psql: AsyncSession = Depends(psql_db),
 ) -> List[Subscription]:
     """Get all subscriptions to a topic in a namespace.
@@ -224,12 +226,12 @@ async def get_subscriptions(
     if topic is None:
         raise HTTPException(status_code=400, detail="Topic not found.")
     return await subscriptions_service.list(
-        topic_id=topic_id, namespace_id=namespace_id, q=q, psql=psql
+        topic_id=topic_id, namespace_id=namespace_id, name=name, psql=psql
     )
 
 
 @pubsub_router.delete(
-    "/namespaces/{namespace_id}/topic/{topic_id}/subscriptions/{subscription_id}",
+    "/namespaces/{namespace_id}/topics/{topic_id}/subscriptions/{subscription_id}",
     response_model=SubscriptionRead,
 )
 async def delete_subscriptions(

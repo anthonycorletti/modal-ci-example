@@ -35,7 +35,7 @@ jobs:
         run: ./scripts/lint.sh
 
       - name: run postgres
-        run: ./scripts/run-postgres.sh
+        run: POSTGRES_DB=hudson_test ./scripts/run-postgres.sh
 
       - name: test
         run: ./scripts/test.sh

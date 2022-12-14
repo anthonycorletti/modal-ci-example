@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from pydantic import UUID4
-from sqlmodel import column, select
+from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from hudson.models import (
@@ -34,14 +34,14 @@ class NamespaceService:
         await psql.refresh(namespace)
         return namespace
 
-    async def list(self, q: Optional[str], psql: AsyncSession) -> List[Namespace]:
-        if q is not None:
+    async def list(self, name: Optional[str], psql: AsyncSession) -> List[Namespace]:
+        if name is not None:
             results = (
                 (
                     await psql.execute(
                         select(Namespace)
-                        .where(column("name").contains(q))
-                        .order_by(column("name"))
+                        .where(Namespace.name.contains(name))  # type: ignore
+                        .order_by(Namespace.name)
                     )
                 )
                 .scalars()
@@ -49,7 +49,7 @@ class NamespaceService:
             )
         else:
             results = (
-                (await psql.execute(select(Namespace).order_by(column("name"))))
+                (await psql.execute(select(Namespace).order_by(Namespace.name)))
                 .scalars()
                 .all()
             )
@@ -68,18 +68,18 @@ class NamespaceService:
 
 class TopicsService:
     async def list(
-        self, namespace_id: UUID4, q: Optional[str], psql: AsyncSession
+        self, namespace_id: UUID4, name: Optional[str], psql: AsyncSession
     ) -> List[Topic]:
-        if q is not None:
+        if name is not None:
             results = (
                 (
                     await psql.execute(
                         select(Topic)
                         .where(
                             Topic.namespace_id == namespace_id,
-                            column("name").contains(q),
+                            Topic.name.contains(name),  # type: ignore
                         )
-                        .order_by(column("name"))
+                        .order_by(Topic.name)
                     )
                 )
                 .scalars()
@@ -91,7 +91,7 @@ class TopicsService:
                     await psql.execute(
                         select(Topic)
                         .where(Topic.namespace_id == namespace_id)
-                        .order_by(column("name"))
+                        .order_by(Topic.name)
                     )
                 )
                 .scalars()
@@ -161,9 +161,13 @@ class SubscriptionsService:
         return subscription
 
     async def list(
-        self, namespace_id: UUID4, topic_id: UUID4, q: Optional[str], psql: AsyncSession
+        self,
+        namespace_id: UUID4,
+        topic_id: UUID4,
+        name: Optional[str],
+        psql: AsyncSession,
     ) -> List[Subscription]:
-        if q is not None:
+        if name is not None:
             results = (
                 (
                     await psql.execute(
@@ -172,9 +176,9 @@ class SubscriptionsService:
                         .where(
                             Topic.namespace_id == namespace_id,
                             Subscription.topic_id == topic_id,
-                            column("name").contains(q),
+                            Subscription.name.contains(name),  # type: ignore
                         )
-                        .order_by(column("name"))
+                        .order_by(Subscription.name)
                     )
                 )
                 .scalars()
@@ -190,7 +194,7 @@ class SubscriptionsService:
                             Topic.namespace_id == namespace_id,
                             Subscription.topic_id == topic_id,
                         )
-                        .order_by(column("name"))
+                        .order_by(Subscription.name)
                     )
                 )
                 .scalars()

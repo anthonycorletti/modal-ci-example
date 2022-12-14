@@ -16,6 +16,6 @@ def test_cli_version(runner: CliRunner) -> None:
 def test_cli_start_server(runner: CliRunner) -> None:
     p = Process(target=runner.invoke, args=(app, ["server"]))
     p.start()
-    time.sleep(3)
+    time.sleep(1.5)
     p.terminate()
     p.join()

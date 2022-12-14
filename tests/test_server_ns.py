@@ -38,7 +38,7 @@ async def test_get_namespaces_q(client: AsyncClient) -> None:
     assert response.status_code == 200
     assert response.json()["name"] == "test"
     ns_id = response.json()["id"]
-    response = await client.get("/namespaces?q=test")
+    response = await client.get("/namespaces?name=test")
     assert response.status_code == 200
     assert len(response.json()) == 1
     assert response.json()[0]["name"] == "test"
@@ -46,7 +46,7 @@ async def test_get_namespaces_q(client: AsyncClient) -> None:
 
 
 async def test_get_namespaces_q_no_match(client: AsyncClient) -> None:
-    response = await client.get("/namespaces?q=foo")
+    response = await client.get("/namespaces?name=foo")
     assert response.status_code == 200
     assert len(response.json()) == 0
 
@@ -55,7 +55,7 @@ async def test_get_namespaces_q_multiple(client: AsyncClient) -> None:
     response = await client.post("/namespaces", json={"name": "foo"})
     assert response.status_code == 200
     assert response.json()["name"] == "foo"
-    response = await client.get("/namespaces?q=foo")
+    response = await client.get("/namespaces?name=foo")
     assert response.status_code == 200
     assert len(response.json()) == 1
     assert response.json()[0]["name"] == "foo"
@@ -65,7 +65,7 @@ async def test_get_namespaces_q_multiple_no_match(client: AsyncClient) -> None:
     response = await client.post("/namespaces", json={"name": "foo"})
     assert response.status_code == 200
     assert response.json()["name"] == "foo"
-    response = await client.get("/namespaces?q=bar")
+    response = await client.get("/namespaces?name=bar")
     assert response.status_code == 200
     assert len(response.json()) == 0
 
