@@ -8,7 +8,7 @@ from sqlmodel.ext.asyncio.session import AsyncEngine
 
 from alembic import context
 from hudson._env import env
-from hudson.models import Namespace  # noqa
+from hudson.models import Namespace, Topic  # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

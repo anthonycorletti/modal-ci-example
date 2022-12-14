@@ -1,21 +1,29 @@
 from datetime import datetime
 from typing import List, Optional
 
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, HTTPException
 from pydantic import UUID4
-from sqlmodel import column, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from hudson import __version__
-from hudson._types import (
-    CreateDatasetResponse,
-    DataArray,
-    DeleteDatasetResponse,
-    GetDatasetResponse,
-    HealthResponse,
-)
+from hudson._types import DataArray, HealthResponse
 from hudson.db import psql_db
-from hudson.models import CreateNamespace, Namespace, ReadNamespace
+from hudson.models import (
+    Namespace,
+    NamespaceCreate,
+    NamespaceRead,
+    Subscription,
+    SubscriptionCreate,
+    SubscriptionRead,
+    Topic,
+    TopicCreate,
+    TopicRead,
+)
+from hudson.server.services import (
+    namespace_service,
+    subscriptions_service,
+    topics_service,
+)
 from hudson.server.utils import _APIRoute
 
 health_router = APIRouter(route_class=_APIRoute, tags=["health"])
@@ -34,34 +42,29 @@ async def get_health() -> HealthResponse:
     return HealthResponse(message="⛵️", version=__version__, time=datetime.utcnow())
 
 
-@namespace_router.post("/namespaces", response_model=ReadNamespace)
+@namespace_router.post("/namespaces", response_model=NamespaceRead)
 async def create_namespaces(
-    create_namespace: CreateNamespace = Body(...),
+    namespace_create: NamespaceCreate = Body(...),
     psql: AsyncSession = Depends(psql_db),
 ) -> Namespace:
     """Create a namespace if it does not exist.
 
     Args:
-        create_namespace (CreateNamespace): The namespace to create.
+        namespace_create (NamespaceCreate): The namespace to create.
         psql (Session): The database session.
 
     Returns:
         Namespace: The created namespace.
     """
-    results = await psql.execute(
-        select(Namespace).where(Namespace.name == create_namespace.name)
+    namespace = await namespace_service.get_by_name(
+        name=namespace_create.name, psql=psql
     )
-    namespace = results.scalars().first()
     if namespace is not None:
         return namespace
-    namespace = Namespace(name=create_namespace.name)
-    psql.add(namespace)
-    await psql.commit()
-    await psql.refresh(namespace)
-    return namespace
+    return await namespace_service.create(namespace_create=namespace_create, psql=psql)
 
 
-@namespace_router.get("/namespaces", response_model=List[ReadNamespace])
+@namespace_router.get("/namespaces", response_model=List[NamespaceRead])
 async def get_namespaces(
     q: Optional[str] = None, psql: AsyncSession = Depends(psql_db)
 ) -> List[Namespace]:
@@ -70,28 +73,10 @@ async def get_namespaces(
     Returns:
         List[Namespace]: The namespaces.
     """
-    if q is not None:
-        results = (
-            (
-                await psql.execute(
-                    select(Namespace)
-                    .where(column("name").contains(q))
-                    .order_by(column("name"))
-                )
-            )
-            .scalars()
-            .all()
-        )
-    else:
-        results = (
-            (await psql.execute(select(Namespace).order_by(column("name"))))
-            .scalars()
-            .all()
-        )
-    return results
+    return await namespace_service.list(q=q, psql=psql)
 
 
-@namespace_router.delete("/namespaces/{namespace_id}", response_model=ReadNamespace)
+@namespace_router.delete("/namespaces/{namespace_id}", response_model=NamespaceRead)
 async def delete_namespaces(
     namespace_id: UUID4, psql: AsyncSession = Depends(psql_db)
 ) -> Namespace:
@@ -101,62 +86,199 @@ async def delete_namespaces(
         namespace_id (UUID4): The namespace id.
 
     Returns:
-        Namespace: The deleted namespace.
+        Optional[Namespace]: The deleted namespace.
     """
-    results = await psql.execute(select(Namespace).where(Namespace.id == namespace_id))
-    namespace = results.scalars().first()
-
-    if namespace:
-        await psql.delete(namespace)
-        await psql.commit()
-    return namespace
+    namespace = await namespace_service.get(namespace_id=namespace_id, psql=psql)
+    if namespace is None:
+        raise HTTPException(status_code=400, detail="Namespace not found.")
+    return await namespace_service.delete(namespace_id=namespace_id, psql=psql)
 
 
-@pubsub_router.get("/namespace/{namespace_id}/topics")
-async def get_topics(namespace_id: UUID4) -> None:
-    # TODO: get topics
-    pass
+@pubsub_router.get("/namespaces/{namespace_id}/topics", response_model=List[TopicRead])
+async def get_topics(
+    namespace_id: UUID4, q: Optional[str] = None, psql: AsyncSession = Depends(psql_db)
+) -> List[Topic]:
+    """Get all topics in a namespace.
+
+    Args:
+        namespace_id (UUID4): The namespace id.
+
+    Returns:
+        List[Topic]: The topics.
+    """
+    namespace = await namespace_service.get(namespace_id=namespace_id, psql=psql)
+    if namespace is None:
+        raise HTTPException(status_code=400, detail="Namespace not found.")
+    return await topics_service.list(namespace_id=namespace_id, q=q, psql=psql)
 
 
-@pubsub_router.post("/namespace/{namespace_id}/topics")
-async def create_topics(namespace_id: UUID4) -> None:
-    # TODO: create topic
-    pass
+@pubsub_router.post("/namespaces/{namespace_id}/topics", response_model=TopicRead)
+async def create_topics(
+    namespace_id: UUID4,
+    topic_create: TopicCreate = Body(...),
+    psql: AsyncSession = Depends(psql_db),
+) -> Topic:
+    """Create a topic in a namespace if it does not exist.
+
+    Args:
+        namespace_id (UUID4): The namespace id.
+        topic_create (TopicCreate): The topic to create. Defaults to Body(...).
+
+    Returns:
+        Topic: The created topic.
+    """
+    namespace = await namespace_service.get(namespace_id=namespace_id, psql=psql)
+    if namespace is None:
+        raise HTTPException(status_code=400, detail="Namespace not found.")
+    topic_create.namespace_id = namespace_id
+    return await topics_service.create(topic_create=topic_create, psql=psql)
 
 
-@pubsub_router.post("/namespace/{namespace_id}/topics")
-async def delete_topics(namespace_id: UUID4) -> None:
-    # TODO: delete topics and associated subscriptions
-    pass
+@pubsub_router.delete(
+    "/namespaces/{namespace_id}/topics/{topic_id}", response_model=TopicRead
+)
+async def delete_topics(
+    namespace_id: UUID4, topic_id: UUID4, psql: AsyncSession = Depends(psql_db)
+) -> Topic:
+    """Delete a topic in a namespace.
+
+    Args:
+        namespace_id (UUID4): The namespace id.
+        topic_id (UUID4): The topic id.
+
+    Returns:
+        Topic: The deleted topic.
+    """
+    namespace = await namespace_service.get(namespace_id=namespace_id, psql=psql)
+    if namespace is None:
+        raise HTTPException(status_code=400, detail="Namespace not found.")
+    topic = await topics_service.get(
+        topic_id=topic_id, namespace_id=namespace_id, psql=psql
+    )
+    if topic is None:
+        raise HTTPException(status_code=400, detail="Topic not found.")
+    return await topics_service.delete(
+        topic_id=topic_id, namespace_id=namespace_id, psql=psql
+    )
 
 
-@pubsub_router.get("/namespace/{namespace_id}/subscriptions")
-async def get_subscriptions(namespace_id: UUID4) -> None:
-    # TODO: get subscriptions
-    pass
+@pubsub_router.post(
+    "/namespaces/{namespace_id}/topics/{topic_id}/subscriptions",
+    response_model=List[SubscriptionRead],
+)
+async def create_subscriptions(
+    namespace_id: UUID4,
+    topic_id: UUID4,
+    subscription_create: SubscriptionCreate = Body(...),
+    psql: AsyncSession = Depends(psql_db),
+) -> Subscription:
+    """Create a subscription to a topic in a namespace if it does not exist.
+
+    Args:
+        namespace_id (UUID4): The namespace id.
+        topic_id (UUID4): The topic id.
+        subscription_create (SubscriptionCreate): The subscription to create.
+            Defaults to Body(...).
+
+    Returns:
+        Subscription: The created subscription.
+    """
+    namespace = await namespace_service.get(namespace_id=namespace_id, psql=psql)
+    if namespace is None:
+        raise HTTPException(status_code=400, detail="Namespace not found.")
+    topic = await topics_service.get(
+        topic_id=topic_id, psql=psql, namespace_id=namespace_id
+    )
+    if topic is None:
+        raise HTTPException(status_code=400, detail="Topic not found.")
+    return await subscriptions_service.create(
+        subscription_create=subscription_create, psql=psql
+    )
 
 
-@pubsub_router.post("/namespace/{namespace_id}/subscriptions")
-async def create_subscriptions(namespace_id: UUID4) -> None:
-    # TODO: create subscriptions
-    pass
+@pubsub_router.get(
+    "/namespaces/{namespace_id}/topics/{topic_id}/subscriptions/",
+    response_model=List[SubscriptionRead],
+)
+async def get_subscriptions(
+    namespace_id: UUID4,
+    topic_id: UUID4,
+    q: Optional[str],
+    psql: AsyncSession = Depends(psql_db),
+) -> List[Subscription]:
+    """Get all subscriptions to a topic in a namespace.
+
+    Args:
+        namespace_id (UUID4): The namespace id.
+        topic_id (UUID4): The topic id.
+
+    Returns:
+        List[Subscription]: The subscriptions.
+    """
+    namespace = await namespace_service.get(namespace_id=namespace_id, psql=psql)
+    if namespace is None:
+        raise HTTPException(status_code=400, detail="Namespace not found.")
+    topic = await topics_service.get(
+        topic_id=topic_id, psql=psql, namespace_id=namespace_id
+    )
+    if topic is None:
+        raise HTTPException(status_code=400, detail="Topic not found.")
+    return await subscriptions_service.list(
+        topic_id=topic_id, namespace_id=namespace_id, q=q, psql=psql
+    )
 
 
-@pubsub_router.post("/namespace/{namespace_id}/subscriptions")
-async def delete_subscriptions(namespace_id: UUID4) -> None:
-    # TODO: delete subscriptions
-    pass
+@pubsub_router.delete(
+    "/namespaces/{namespace_id}/topic/{topic_id}/subscriptions/{subscription_id}",
+    response_model=SubscriptionRead,
+)
+async def delete_subscriptions(
+    namespace_id: UUID4,
+    topic_id: UUID4,
+    subscription_id: UUID4,
+    psql: AsyncSession = Depends(psql_db),
+) -> Subscription:
+    """Delete a subscription to a topic in a namespace.
+
+    Args:
+        namespace_id (UUID4): The namespace id.
+        topic_id (UUID4): The topic id.
+        subscription_id (UUID4): The subscription id.
+
+    Returns:
+        Subscription: The deleted subscription.
+    """
+    namespace = await namespace_service.get(namespace_id=namespace_id, psql=psql)
+    if namespace is None:
+        raise HTTPException(status_code=400, detail="Namespace not found.")
+    topic = await topics_service.get(
+        topic_id=topic_id, psql=psql, namespace_id=namespace_id
+    )
+    if topic is None:
+        raise HTTPException(status_code=400, detail="Topic not found.")
+    subscription = await subscriptions_service.get(
+        subscription_id=subscription_id,
+        topic_id=topic_id,
+        namespace_id=namespace_id,
+        psql=psql,
+    )
+    if subscription is None:
+        raise HTTPException(status_code=400, detail="Subscription not found.")
+    return await subscriptions_service.delete(
+        subscription_id=subscription_id,
+        topic_id=topic_id,
+        namespace_id=namespace_id,
+        psql=psql,
+    )
 
 
-@pubsub_router.post("/namespace/{namespace_id}/topics/{topic}/publish")
-async def publish(namespace_id: UUID4) -> None:
+@pubsub_router.post("/namespaces/{namespace_id}/topics/{topic}/publish")
+async def publish(namespace_id: UUID4, topic_id: UUID4) -> None:
     # TODO: publish a message to a topic
     pass
 
 
-@dataset_router.post(
-    "/namespace/{namespace_id}/datasets", response_model=CreateDatasetResponse
-)
+@dataset_router.post("/namespaces/{namespace_id}/datasets")
 async def create_datasets(
     namespace_id: UUID4, data_array: DataArray = Body(...)
 ) -> None:
@@ -164,9 +286,7 @@ async def create_datasets(
     pass
 
 
-@dataset_router.get(
-    "/namespace/{namespace_id}/datasets", response_model=GetDatasetResponse
-)
+@dataset_router.get("/namespaces/{namespace_id}/datasets")
 async def get_datasets(
     namespace_id: UUID4,
 ) -> None:
@@ -174,10 +294,7 @@ async def get_datasets(
     pass
 
 
-@dataset_router.delete(
-    "/namespace/{namespace_id}/datasets/{dataset_id}",
-    response_model=DeleteDatasetResponse,
-)
+@dataset_router.delete("/namespaces/{namespace_id}/datasets/{dataset_id}")
 async def delete_datasets(namespace_id: UUID4, dataset_id: UUID4) -> None:
     # TODO: delete datasets
     pass

@@ -1,30 +1,21 @@
 from datetime import datetime
+from enum import Enum, unique
 from typing import Dict, List
 
 from docarray.document.pydantic_model import PydanticDocumentArray
 from pydantic import BaseModel, Json, StrictInt, StrictStr
 
 
+@unique
+class DeliveryType(str, Enum):
+    PULL = "pull"
+    PUSH = "push"
+
+
 class HealthResponse(BaseModel):
     message: StrictStr
     version: StrictStr
     time: datetime
-
-
-class BaseResponse(BaseModel):
-    pass
-
-
-class CreateDatasetResponse(BaseResponse):
-    pass
-
-
-class GetDatasetResponse(BaseResponse):
-    pass
-
-
-class DeleteDatasetResponse(BaseResponse):
-    pass
 
 
 class DataArray(BaseModel):

@@ -12,5 +12,5 @@ app = FastAPI(title=HUDSON, version=__version__)
 
 app.include_router(routers.health_router)
 app.include_router(routers.namespace_router)
-app.include_router(routers.dataset_router)
 app.include_router(routers.pubsub_router)
+app.include_router(routers.dataset_router)

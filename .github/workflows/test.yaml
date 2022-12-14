@@ -28,8 +28,14 @@ jobs:
           cache: "pip"
           cache-dependency-path: "pyproject.toml"
 
-      - name: install dependencies
+      - name: install
         run: ./scripts/install.sh
 
-      - name: run tests
+      - name: lint
+        run: ./scripts/lint.sh
+
+      - name: run postgres
+        run: ./scripts/run-postgres.sh
+
+      - name: test
         run: ./scripts/test.sh

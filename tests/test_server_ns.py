@@ -1,19 +1,6 @@
-import os
+from uuid import uuid4
 
 from httpx import AsyncClient
-
-from hudson import __version__
-
-
-async def test_tz() -> None:
-    assert os.environ["TZ"] == "UTC"
-
-
-async def test_healthcheck(client: AsyncClient) -> None:
-    response = await client.get("/healthcheck")
-    assert response.status_code == 200
-    assert response.json()["message"] == "⛵️"
-    assert response.json()["version"] == __version__
 
 
 async def test_create_namespace(client: AsyncClient) -> None:
@@ -26,9 +13,11 @@ async def test_create_namespace_no_duplicates(client: AsyncClient) -> None:
     response = await client.post("/namespaces", json={"name": "test"})
     assert response.status_code == 200
     assert response.json()["name"] == "test"
+    ns_id = response.json()["id"]
     response = await client.post("/namespaces", json={"name": "test"})
     assert response.status_code == 200
     assert response.json()["name"] == "test"
+    assert response.json()["id"] == ns_id
     response = await client.get("/namespaces")
     assert response.status_code == 200
     assert len(response.json()) == 1
@@ -92,3 +81,10 @@ async def test_delete_namespaces(client: AsyncClient) -> None:
     response = await client.get("/namespaces")
     assert response.status_code == 200
     assert len(response.json()) == 0
+    assert len(response.json()) == 0
+
+
+async def test_delete_namespace_not_found(client: AsyncClient) -> None:
+    response = await client.delete(f"/namespaces/{uuid4()}")
+    assert response.status_code == 400
+    assert response.status_code == 400
