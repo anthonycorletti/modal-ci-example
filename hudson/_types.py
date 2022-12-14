@@ -1,14 +1,17 @@
+import base64
+import json
+import sys
 from datetime import datetime
 from enum import Enum, unique
 from typing import Dict, List
 
 from docarray.document.pydantic_model import PydanticDocumentArray
-from pydantic import BaseModel, Json, StrictInt, StrictStr
+from pydantic import BaseModel, Json, StrictInt, StrictStr, validator
 
 
 @unique
 class DeliveryType(str, Enum):
-    PULL = "pull"
+    # PULL = "pull" – TODO: coming soon!
     PUSH = "push"
 
 
@@ -65,3 +68,24 @@ class ResponseLoggerMessage(BaseModel):
     status_code: StrictInt
     body: Json
     raw_headers: List
+
+
+class Message(BaseModel):
+    data: StrictStr
+
+    @validator("data", pre=True, always=True)
+    def validate_data_is_less_than_10mb(cls: BaseModel, v: str) -> str:
+        if sys.getsizeof(v) > 10_000_000:
+            raise ValueError("Message data must be less than or equal to 10MB.")
+        try:
+            json.dumps(base64.b64decode(v.encode("utf-8")).decode("utf-8"))
+        except json.JSONDecodeError:
+            raise ValueError("Message data must be a valid base64 encoded JSON string.")
+        return v
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "data": {"message": "Hello world!"},
+            }
+        }

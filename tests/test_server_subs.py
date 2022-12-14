@@ -25,8 +25,7 @@ async def test_create_subscription(
             "name": "default",
             "topic_id": topic["id"],
             "delivery_type": "push",
-            "message_retention_duration_minutes": 1,
-            "endpoint": "https://localhost:4242",
+            "push_endpoint": "https://localhost:4242",
         },
     )
     assert response.status_code == 200
@@ -58,8 +57,7 @@ async def test_create_subscription_that_already_exists(client: AsyncClient) -> N
             "name": "default",
             "topic_id": topic["id"],
             "delivery_type": "push",
-            "endpoint": "https://localhost:4242",
-            "message_retention_duration_minutes": 1,
+            "push_endpoint": "https://localhost:4242",
         },
     )
     assert response.status_code == 200
@@ -74,8 +72,7 @@ async def test_create_subscription_that_already_exists(client: AsyncClient) -> N
             "name": "default",
             "topic_id": topic["id"],
             "delivery_type": "push",
-            "endpoint": "https://localhost:4242",
-            "message_retention_duration_minutes": 1,
+            "push_endpoint": "https://localhost:4242",
         },
     )
     assert response.status_code == 200
@@ -98,8 +95,7 @@ async def test_get_subscriptions(client: AsyncClient) -> None:
             "name": "default",
             "topic_id": topic["id"],
             "delivery_type": "push",
-            "endpoint": "https://localhost:4242",
-            "message_retention_duration_minutes": 1,
+            "push_endpoint": "https://localhost:4242",
         },
     )
     assert response.status_code == 200
@@ -140,8 +136,7 @@ async def test_delete_subscription(client: AsyncClient) -> None:
             "name": "default",
             "topic_id": topic["id"],
             "delivery_type": "push",
-            "endpoint": "https://localhost:4242",
-            "message_retention_duration_minutes": 1,
+            "push_endpoint": "https://localhost:4242",
         },
     )
     assert response.status_code == 200
@@ -165,8 +160,7 @@ async def test_create_subscription_missing_namespace_fails(client: AsyncClient) 
             "name": "default",
             "topic_id": str(uuid4()),
             "delivery_type": "push",
-            "endpoint": "https://localhost:4242",
-            "message_retention_duration_minutes": 1,
+            "push_endpoint": "https://localhost:4242",
         },
     )
     assert response.status_code == 400
@@ -183,8 +177,7 @@ async def test_create_subscription_missing_topic_fails(client: AsyncClient) -> N
             "name": "default",
             "topic_id": str(uuid4()),
             "delivery_type": "push",
-            "endpoint": "https://localhost:4242",
-            "message_retention_duration_minutes": 1,
+            "push_endpoint": "https://localhost:4242",
         },
     )
     assert response.status_code == 400
@@ -266,8 +259,7 @@ async def test_delete_namespace_cascades_to_subscriptions(
             "name": "default",
             "topic_id": topic["id"],
             "delivery_type": "push",
-            "endpoint": "https://localhost:4242",
-            "message_retention_duration_minutes": 1,
+            "push_endpoint": "https://localhost:4242",
         },
     )
     assert response.status_code == 200
@@ -281,3 +273,28 @@ async def test_delete_namespace_cascades_to_subscriptions(
                 select(Subscription).where(Subscription.id == subscription["id"])
             )
         ).scalar_one_or_none() is None
+
+
+async def test_create_subscription_needs_https_endpoint(
+    client: AsyncClient, async_db_session: AsyncSession
+) -> None:
+    response = await client.post("/namespaces", json={"name": "hudson"})
+    assert response.status_code == 200
+    namespace = response.json()
+    response = await client.post(
+        f"/namespaces/{namespace['id']}/topics",
+        json={"name": "default", "namespace_id": namespace["id"]},
+    )
+    assert response.status_code == 200
+    topic = response.json()
+    response = await client.post(
+        f"/namespaces/{namespace['id']}/topics/{topic['id']}/subscriptions",
+        json={
+            "name": "default",
+            "topic_id": topic["id"],
+            "delivery_type": "push",
+            "push_endpoint": "http://localhost:4242",
+        },
+    )
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["msg"] == "push_endpoint must be a HTTPS URL"

@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import uuid4
 
-from pydantic import UUID4, BaseModel, HttpUrl, validator
+from pydantic import UUID4, AnyHttpUrl, BaseModel, validator
 from sqlalchemy import Column, DateTime, UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -101,11 +101,12 @@ class TopicRead(BaseTopic, UUIDMixin, TimestampsMixin):
 class BaseSubscription(SQLModel):
     name: str
     delivery_type: DeliveryType
-    message_retention_duration_minutes: int = Field(..., ge=0, le=7 * 24 * 60)
-    push_endpoint: Optional[HttpUrl]
+    # TODO: coming soon!
+    # message_retention_duration_minutes: int = Field(..., ge=0, le=7 * 24 * 60)
+    push_endpoint: Optional[AnyHttpUrl]
 
-    @validator("push_endpoint")
-    def validate_push_endpoint_https(cls, v: HttpUrl) -> HttpUrl:
+    @validator("push_endpoint", pre=True, always=True)
+    def validate_push_endpoint_https(cls, v: AnyHttpUrl) -> AnyHttpUrl:
         if v is not None and not v.startswith("https://"):
             raise ValueError("push_endpoint must be a HTTPS URL")
         return v

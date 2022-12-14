@@ -6,7 +6,7 @@ from pydantic import UUID4
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from hudson import __version__
-from hudson._types import DataArray, HealthResponse
+from hudson._types import DataArray, HealthResponse, Message
 from hudson.db import psql_db
 from hudson.models import (
     Namespace,
@@ -274,10 +274,35 @@ async def delete_subscriptions(
     )
 
 
-@pubsub_router.post("/namespaces/{namespace_id}/topics/{topic}/publish")
-async def publish(namespace_id: UUID4, topic_id: UUID4) -> None:
-    # TODO: publish a message to a topic
-    pass
+@pubsub_router.post(
+    "/namespaces/{namespace_id}/topics/{topic_id}/publish",
+    response_model=None,
+)
+async def publish_message_to_topic(
+    namespace_id: UUID4,
+    topic_id: UUID4,
+    message: Message = Body(...),
+    psql: AsyncSession = Depends(psql_db),
+) -> None:
+    """Publish a message to a topic in a namespace.
+
+    Args:
+        namespace_id (UUID4): The namespace id.
+        topic_id (UUID4): The topic id.
+        message (Message): The message to publish.
+
+    Returns:
+        None.
+    """
+    namespace = await namespace_service.get(namespace_id=namespace_id, psql=psql)
+    if namespace is None:
+        raise HTTPException(status_code=400, detail="Namespace not found.")
+    topic = await topics_service.get(
+        topic_id=topic_id, namespace_id=namespace_id, psql=psql
+    )
+    if topic is None:
+        raise HTTPException(status_code=400, detail="Topic not found.")
+    return await topics_service.publish_message(topic=topic, message=message)
 
 
 @dataset_router.post("/namespaces/{namespace_id}/datasets")

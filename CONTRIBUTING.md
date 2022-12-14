@@ -2,7 +2,7 @@
 
 Assuming you have cloned this repository to your local machine, you can follow these guidelines to make contributions.
 
-**First, please install pyenv https://github.com/pyenv/pyenv to manage your python environment.**
+**First, please install pyenv <https://github.com/pyenv/pyenv> to manage your python environment.**
 
 Install the version of python as mentioned in this repo.
 
@@ -51,6 +51,35 @@ pyenv rehash
 
 ## Tests
 
+Make sure postgres is running. We have a script that runs a postgres docker container for you.
+
+```sh
+./scripts/run-postgres.sh
+```
+
+Then run the tests. The tests should automatically run migrations for the app.
+
 ```sh
 ./scripts/test.sh
+```
+
+## Running hudson
+
+Start postgres
+
+```sh
+./scripts/run-postgres.sh
+```
+
+Start hudson
+
+```sh
+hudson server --reload
+```
+
+Check that hudson is running
+
+```
+$ curl -s "http://localhost:8000/healthcheck" | jq .message
+"⛵️"
 ```

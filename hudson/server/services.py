@@ -1,9 +1,13 @@
+import asyncio
+import base64
 from typing import List, Optional
 
+import httpx
 from pydantic import UUID4
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from hudson._types import Message
 from hudson.models import (
     Namespace,
     NamespaceCreate,
@@ -139,6 +143,32 @@ class TopicsService:
             await psql.delete(topic)
             await psql.commit()
         return topic
+
+    async def publish_message(self, topic: Topic, message: Message) -> None:
+        # TODO: right now hudson only supports http-push publishing to HTTPS endpoints
+        # TODO: hudson should support other modes and other protocols,
+        # TODO: e.g. pull, gRPC, etc.
+        await asyncio.gather(
+            *[
+                self.publish_message_to_subscription(
+                    subscription=sub,
+                    message=base64.b64decode(message.data.encode("utf-8")).decode(
+                        "utf-8"
+                    ),
+                )
+                for sub in topic.subscriptions
+            ]
+        )
+
+    async def publish_message_to_subscription(
+        self, subscription: Subscription, message: str
+    ) -> None:
+        async with httpx.AsyncClient() as client:
+            await client.post(
+                str(subscription.push_endpoint),
+                json=message,
+                headers={"Content-Type": "application/json"},
+            )
 
 
 class SubscriptionsService:
