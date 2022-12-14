@@ -3,7 +3,6 @@ from typing import Dict, List
 
 from docarray.document.pydantic_model import PydanticDocumentArray
 from pydantic import BaseModel, Json, StrictInt, StrictStr
-from starlette.datastructures import Headers, MutableHeaders, QueryParams
 
 
 class HealthResponse(BaseModel):
@@ -52,17 +51,26 @@ class DataArray(BaseModel):
         }
 
 
+class Scope(BaseModel):
+    type: StrictStr
+    asgi: Dict
+    http_version: StrictStr
+    method: StrictStr
+    scheme: StrictStr
+    root_path: StrictStr
+    path: StrictStr
+    raw_path: str
+    headers: List
+    query_string: bytes
+
+
 class RequestLoggerMessage(BaseModel):
-    scope: Dict
+    scope: Scope
     _stream_consumed: bool
     _is_disconnected: bool
-    _query_params: QueryParams
-    _headers: Headers
-    _cookies: Dict
 
 
 class ResponseLoggerMessage(BaseModel):
     status_code: StrictInt
     body: Json
     raw_headers: List
-    _headers: MutableHeaders

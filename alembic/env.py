@@ -1,6 +1,7 @@
 import asyncio
 from logging.config import fileConfig
 
+from sqlalchemy import pool
 from sqlalchemy.engine.base import Connection
 from sqlmodel import SQLModel, create_engine
 from sqlmodel.ext.asyncio.session import AsyncEngine
@@ -28,6 +29,14 @@ target_metadata = SQLModel.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+
+target_metadata.naming_convention = {
+    "ix": "ix_%(column_0_label)s",
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)" "s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s",
+}
 
 
 def get_url() -> str:
@@ -74,14 +83,17 @@ async def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    connectable = AsyncEngine(create_engine(get_url(), future=True))
+    connectable = AsyncEngine(
+        create_engine(get_url(), future=True, poolclass=pool.NullPool)
+    )
 
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)
+
+    await connectable.dispose()
 
 
 if context.is_offline_mode():
     run_migrations_offline()
 else:
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(run_migrations_online())
+    asyncio.run(run_migrations_online())

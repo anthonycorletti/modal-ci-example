@@ -10,6 +10,6 @@ docker run --rm -d --name hudson-postgres \
 -e POSTGRES_DB=hudson \
 postgres:15.1
 
-# Create another database called hudson_test
 echo "Creating another database called hudson_test for testing."
+sleep 1
 docker exec -it hudson-postgres psql -h 0.0.0.0 -U hudson -c "CREATE DATABASE hudson_test;"

@@ -1,3 +1,4 @@
+import json
 from typing import Callable
 
 from fastapi import Request, Response
@@ -19,8 +20,8 @@ class _APIRoute(APIRoute):
         original_route_handler = super().get_route_handler()
 
         def _log(req: RequestLoggerMessage, res: ResponseLoggerMessage) -> None:
-            log.info({"req": req.dict()})
-            log.info({"res": res.dict()})
+            log.info({"req": json.loads(req.json())})
+            log.info({"res": json.loads(res.json())})
 
         async def custom_route_handler(request: Request) -> Response:
             req = RequestLoggerMessage(**request.__dict__)

@@ -25,6 +25,12 @@ class TimestampsMixin(BaseModel):
     )
 
 
+class UUIDMixin(BaseModel):
+    id: Optional[UUID4] = Field(
+        default_factory=uuid4, primary_key=True, index=True, nullable=False
+    )
+
+
 class BaseNamespace(SQLModel):
     name: str
 
@@ -37,24 +43,12 @@ class BaseNamespace(SQLModel):
 
 
 class CreateNamespace(BaseNamespace):
-    pass
+    ...
 
 
-class Namespace(BaseNamespace, TimestampsMixin, table=True):
+class Namespace(BaseNamespace, UUIDMixin, TimestampsMixin, table=True):
     __tablename__ = "namespaces"
 
-    id: Optional[UUID4] = Field(default_factory=uuid4, primary_key=True, nullable=False)
-    name: str
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "name": "hudson",
-            }
-        }
-
-
-class ReadNamespace(BaseNamespace):
-    id: UUID4
-    created_at: datetime
-    updated_at: datetime
+class ReadNamespace(BaseNamespace, UUIDMixin, TimestampsMixin):
+    ...
