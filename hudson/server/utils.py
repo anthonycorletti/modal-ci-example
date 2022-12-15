@@ -19,19 +19,15 @@ class _APIRoute(APIRoute):
     def get_route_handler(self) -> Callable:
         original_route_handler = super().get_route_handler()
 
-        def _log(req: RequestLoggerMessage, res: ResponseLoggerMessage) -> None:
-            log.info({"req": json.loads(req.json())})
-            log.info({"res": json.loads(res.json())})
+        async def _log(req: RequestLoggerMessage, res: ResponseLoggerMessage) -> None:
+            await log.ainfo(req.json())
+            await log.ainfo(res.json())
 
         async def custom_route_handler(request: Request) -> Response:
             req = RequestLoggerMessage(**request.__dict__)
             response = await original_route_handler(request)
             res = ResponseLoggerMessage(**response.__dict__)
-            bt = BackgroundTask(_log, req, res)
-            if response.background is None:
-                response.background = bt
-            else:
-                response.background.__dict__["tasks"].append(bt)
+            await _log(req=req, res=res)
             return response
 
         return custom_route_handler

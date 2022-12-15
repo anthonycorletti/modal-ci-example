@@ -19,6 +19,7 @@ from hudson.models import (
     TopicCreate,
     TopicRead,
 )
+from hudson.server.log import log
 from hudson.server.services import (
     namespace_service,
     subscriptions_service,
@@ -39,6 +40,7 @@ async def get_health() -> HealthResponse:
     Returns:
         HealthResponse: The health of the server.
     """
+    await log.ainfo("Healthcheck")
     return HealthResponse(message="⛵️", version=__version__, time=datetime.utcnow())
 
 
