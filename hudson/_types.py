@@ -3,7 +3,7 @@ import json
 import sys
 from datetime import datetime
 from enum import Enum, unique
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from docarray.document.pydantic_model import PydanticDocumentArray
 from pydantic import BaseModel, Json, StrictInt, StrictStr, validator
@@ -47,13 +47,13 @@ class DataArray(BaseModel):
 
 class Scope(BaseModel):
     type: StrictStr
-    asgi: Dict
+    asgi: Optional[Dict]
     http_version: StrictStr
     method: StrictStr
     scheme: StrictStr
-    root_path: StrictStr
+    root_path: Optional[StrictStr]
     path: StrictStr
-    raw_path: str
+    raw_path: Optional[str]
     headers: List
     query_string: bytes
 

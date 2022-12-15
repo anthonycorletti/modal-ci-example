@@ -40,7 +40,7 @@ async def get_health() -> HealthResponse:
     Returns:
         HealthResponse: The health of the server.
     """
-    await log.ainfo("Healthcheck")
+    log.info("Healthcheck")
     return HealthResponse(message="⛵️", version=__version__, time=datetime.utcnow())
 
 

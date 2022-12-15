@@ -1,61 +1,97 @@
-import structlog
+import asyncio
+import datetime
+import json
+import logging
+import socket
+from logging.handlers import QueueHandler
+from queue import SimpleQueue
+from typing import Any, List
+
+from hudson._env import env
 
 
-def _define_structlog() -> None:
-    structlog.configure(
-        processors=[
-            structlog.stdlib.filter_by_level,
-            structlog.stdlib.add_logger_name,
-            structlog.stdlib.add_log_level,
-            structlog.processors.CallsiteParameterAdder(
-                [
-                    structlog.processors.CallsiteParameter.FILENAME,
-                    structlog.processors.CallsiteParameter.FUNC_NAME,
-                    structlog.processors.CallsiteParameter.LINENO,
-                    structlog.processors.CallsiteParameter.MODULE,
-                    structlog.processors.CallsiteParameter.PATHNAME,
-                    structlog.processors.CallsiteParameter.PROCESS_NAME,
-                    structlog.processors.CallsiteParameter.PROCESS,
-                    structlog.processors.CallsiteParameter.THREAD,
-                    structlog.processors.CallsiteParameter.THREAD_NAME,
-                ],
-            ),
-            structlog.stdlib.PositionalArgumentsFormatter(),
-            structlog.processors.TimeStamper(fmt="iso"),
-            structlog.processors.StackInfoRenderer(),
-            structlog.processors.format_exc_info,
-            structlog.processors.UnicodeDecoder(),
-            structlog.processors.JSONRenderer(sort_keys=True),
-        ],
-        context_class=dict,
-        logger_factory=structlog.stdlib.LoggerFactory(),
-        wrapper_class=structlog.stdlib.AsyncBoundLogger,
-        cache_logger_on_first_use=True,
-    )
+class LogEncoder(json.JSONEncoder):
+    def default(self, obj: Any) -> Any:
+        if isinstance(obj, bytes):
+            return obj.decode("utf-8")
+        elif isinstance(obj, (set, frozenset)):
+            return tuple(obj)
+        elif isinstance(obj, (datetime.datetime, datetime.date, datetime.time)):
+            return obj.isoformat()
+        return super().default(obj)
 
 
-def _set_log_level(logger: structlog.stdlib.AsyncBoundLogger) -> None:
-    """Set the parent logger level.
+class StructuredMessage:
+    def __init__(self, **kwargs: Any) -> None:
+        self.kwargs = kwargs
 
-    Args:
-        logger (structlog.stdlib.AsyncBoundLogger): The logger.
+    def __str__(self) -> str:
+        return LogEncoder().encode(self.kwargs)
+
+
+class OnelineFormatter(logging.Formatter):
+    def formatException(self, exc_info: Any) -> str:
+        result = super().formatException(exc_info)
+        return repr(result)
+
+    def format(self, record: logging.LogRecord) -> str:
+        result = super().format(record)
+        if record.exc_text:
+            result = result.replace("\n", "")
+        result_dict = record.__dict__
+        result_dict["host"] = socket.gethostname()
+        return str(StructuredMessage(**result_dict))
+
+
+class StructuredLogger:
+    DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+    @staticmethod
+    def create_logger() -> logging.Logger:
+        logger = logging.getLogger(__name__)
+        log_handler = logging.StreamHandler()
+        formatter = OnelineFormatter(datefmt=StructuredLogger.DATE_FORMAT)
+        log_handler.setFormatter(formatter)
+        logger.addHandler(log_handler)
+        logger.setLevel(env.LOG_LEVEL.upper())
+        return logger
+
+
+class LocalQueueHandler(QueueHandler):
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            self.enqueue(record)
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            self.handleError(record)
+
+
+def setup_logging_queue() -> None:
+    """Move log handlers to a separate thread.
+
+    Replace handlers on the root logger with a LocalQueueHandler,
+    and start a logging.QueueListener holding the original
+    handlers.
+
+    https://www.zopatista.com/python/2019/05/11/asyncio-logging/
     """
-    import logging
+    root = logging.getLogger()
+    queue: SimpleQueue = SimpleQueue()
+    handlers: List[logging.Handler] = []
+    handler = LocalQueueHandler(queue)
 
-    from hudson._env import env
+    root.addHandler(handler)
+    for h in root.handlers[:]:
+        if h is not handler:
+            root.removeHandler(h)
+            handlers.append(h)
 
-    level_name = logging.getLevelName(env.LOG_LEVEL.upper())
-
-    logging.basicConfig(level=level_name, format="%(message)s")
-
-    logger.setLevel(level_name)
-    logger.parent.setLevel(level_name)
-    assert logger.level == logger.parent.level
+    listener = logging.handlers.QueueListener(
+        queue, *handlers, respect_handler_level=True
+    )
+    listener.start()
 
 
-_define_structlog()
-# _set_parent_log_level(logger=structlog.get_logger())
-# log = structlog.wrap_logger(
-#     logger=structlog.get_logger(), wrapper_class=structlog.stdlib.AsyncBoundLogger
-# )
-log = structlog.get_logger()
+log = StructuredLogger.create_logger()
+setup_logging_queue()
