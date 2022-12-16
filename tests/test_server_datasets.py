@@ -112,6 +112,7 @@ async def test_delete_dataset(client: AsyncClient) -> None:
     assert response.status_code == 200
     datasets = response.json()
     assert len(datasets) == 0
+    assert not os.path.exists(f"{env.DATASETS_PATH}/{namespace['id']}/{dataset['id']}")
 
 
 async def test_get_dataset_missing_namespace_fails(client: AsyncClient) -> None:

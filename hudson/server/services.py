@@ -2,6 +2,7 @@ import asyncio
 import base64
 import json
 import os
+import shutil
 import time
 from pathlib import Path
 from typing import List, Optional
@@ -381,6 +382,12 @@ class DatasetsService:
         if dataset:
             await psql.delete(dataset)
             await psql.commit()
+
+        # Delete dataset directory
+        dataset_path = Path(env.DATASETS_PATH) / str(namespace_id) / str(dataset_id)
+        if dataset_path.exists():
+            shutil.rmtree(dataset_path)
+
         return dataset
 
 

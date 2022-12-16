@@ -1,3 +1,4 @@
+import os
 import sys
 
 from pydantic import BaseSettings, Field
@@ -40,7 +41,7 @@ class _Env(BaseSettings):
         description="The PSQL database pre pool ping.",
     )
     DATASETS_PATH: str = Field(
-        "/hudson/data",
+        f"{os.environ['HOME']}/.hudson/datasets",
         env="DATASETS_PATH",
         description="The root dir for storing datasets.",
     )
