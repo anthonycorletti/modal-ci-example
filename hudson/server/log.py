@@ -6,6 +6,7 @@ import socket
 from logging.handlers import QueueHandler
 from queue import SimpleQueue
 from typing import Any, List
+from uuid import UUID
 
 from hudson._env import env
 
@@ -14,6 +15,8 @@ class LogEncoder(json.JSONEncoder):
     def default(self, obj: Any) -> Any:
         if isinstance(obj, bytes):
             return obj.decode("utf-8")
+        elif isinstance(obj, UUID):
+            return str(obj)
         elif isinstance(obj, (set, frozenset)):
             return tuple(obj)
         elif isinstance(obj, (datetime.datetime, datetime.date, datetime.time)):

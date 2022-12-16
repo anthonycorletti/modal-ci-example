@@ -1,6 +1,4 @@
-from typing import AsyncGenerator, Generator
-
-import duckdb
+from typing import AsyncGenerator
 
 # TODO: all sqlalchemy imports should be coming from sqlmodel
 # once sqlmodel has full support for async :soon!:
@@ -9,26 +7,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from hudson._env import env
-
-
-def _duck_db_connection(
-    database_filename: str,
-    read_only: bool = False,
-) -> duckdb.DuckDBPyConnection:
-    """Return a DuckDB database connection."""
-    if not database_filename:
-        database_filename = env.DUCK_DB
-    return duckdb.connect(database=database_filename, read_only=read_only)
-
-
-def duck_db(database_filename: str, read_only: bool = False) -> Generator:
-    """Context manager for a DuckDB database connection."""
-    db = _duck_db_connection(database_filename=database_filename, read_only=read_only)
-    try:
-        yield db
-    finally:
-        db.close()
-
 
 async_psql_engine = create_async_engine(
     url=env.PSQL_URL,

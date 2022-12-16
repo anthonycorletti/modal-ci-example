@@ -84,6 +84,24 @@ async def get_namespaces(
     return await namespace_service.list(name=name, psql=psql)
 
 
+@namespace_router.get("/namespaces/{namespace_id}", response_model=NamespaceRead)
+async def get_namespace(
+    namespace_id: UUID4, psql: AsyncSession = Depends(psql_db)
+) -> Namespace:
+    """Get a namespace.
+
+    Args:
+        namespace_id (UUID4): The namespace id.
+
+    Returns:
+        Namespace: The namespace.
+    """
+    namespace = await namespace_service.get(namespace_id=namespace_id, psql=psql)
+    if namespace is None:
+        raise HTTPException(status_code=400, detail="Namespace not found.")
+    return namespace
+
+
 @namespace_router.delete("/namespaces/{namespace_id}", response_model=NamespaceRead)
 async def delete_namespaces(
     namespace_id: UUID4, psql: AsyncSession = Depends(psql_db)
@@ -315,7 +333,7 @@ async def publish_message_to_topic(
     return await topics_service.publish_message(topic=topic, message=message)
 
 
-@dataset_router.post("/namespaces/{namespace_id}/datasets", response_model=Dataset)
+@dataset_router.post("/namespaces/{namespace_id}/datasets", response_model=DatasetRead)
 async def create_datasets(
     namespace_id: UUID4,
     dataset_create: DatasetCreate = Body(...),
@@ -363,8 +381,34 @@ async def get_datasets(
     return await datasets_service.list(name=name, psql=psql, namespace_id=namespace_id)
 
 
+@dataset_router.get(
+    "/namespaces/{namespace_id}/datasets/{dataset_id}", response_model=DatasetRead
+)
+async def get_dataset(
+    namespace_id: UUID4, dataset_id: UUID4, psql: AsyncSession = Depends(psql_db)
+) -> Dataset:
+    """Get a dataset in a namespace.
+
+    Args:
+        namespace_id (UUID4): The namespace id.
+        dataset_id (UUID4): The dataset id.
+
+    Returns:
+        Dataset: The dataset.
+    """
+    namespace = await namespace_service.get(namespace_id=namespace_id, psql=psql)
+    if namespace is None:
+        raise HTTPException(status_code=400, detail="Namespace not found.")
+    dataset = await datasets_service.get(
+        dataset_id=dataset_id, namespace_id=namespace_id, psql=psql
+    )
+    if dataset is None:
+        raise HTTPException(status_code=400, detail="Dataset not found.")
+    return dataset
+
+
 @dataset_router.delete(
-    "/namespaces/{namespace_id}/datasets/{dataset_id}", response_model=Dataset
+    "/namespaces/{namespace_id}/datasets/{dataset_id}", response_model=DatasetRead
 )
 async def delete_datasets(
     namespace_id: UUID4, dataset_id: UUID4, psql: AsyncSession = Depends(psql_db)

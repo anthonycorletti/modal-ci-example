@@ -28,7 +28,7 @@ class TimestampsMixin(BaseModel):
 
 
 class UUIDMixin(BaseModel):
-    id: Optional[UUID4] = Field(
+    id: UUID4 = Field(
         default_factory=uuid4, primary_key=True, index=True, nullable=False
     )
 
@@ -145,7 +145,7 @@ class SubscriptionRead(BaseSubscription, UUIDMixin, TimestampsMixin):
 
 class BaseDataset(SQLModel):
     name: str
-    description: Optional[str]
+    description: Optional[str] = Field(default=None, nullable=True)
 
     class Config:
         schema_extra = {

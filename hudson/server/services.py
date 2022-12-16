@@ -77,6 +77,11 @@ class NamespaceService:
         if namespace:
             await psql.delete(namespace)
             await psql.commit()
+
+        namespace_dir = Path(env.DATASETS_PATH) / str(namespace.id)
+        if namespace_dir.exists():
+            shutil.rmtree(namespace_dir)
+
         return namespace
 
 
@@ -383,7 +388,6 @@ class DatasetsService:
             await psql.delete(dataset)
             await psql.commit()
 
-        # Delete dataset directory
         dataset_path = Path(env.DATASETS_PATH) / str(namespace_id) / str(dataset_id)
         if dataset_path.exists():
             shutil.rmtree(dataset_path)

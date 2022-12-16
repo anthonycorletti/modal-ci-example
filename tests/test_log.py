@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Any
+from uuid import uuid4
 
 from hudson.server.log import log
 
@@ -14,6 +15,7 @@ def test_logger(capsys: Any) -> None:
             "bytes": b"test",
             "set": {"test", "test2"},
             "time": datetime.now(),
+            "uuid": uuid4(),
         },
     )
 

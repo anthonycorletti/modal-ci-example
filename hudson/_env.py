@@ -10,6 +10,11 @@ class _Env(BaseSettings):
         env="LOG_LEVEL",
         description="Log level.",
     )
+    HUDSON_SERVER_URL: str = Field(
+        "http://localhost:8000",
+        env="HUDSON_SERVER_URL",
+        description="The Hudson server URL.",
+    )
     API_SECRET_KEY: str = Field(
         ...,
         env="API_SECRET_KEY",

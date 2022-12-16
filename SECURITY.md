@@ -8,7 +8,7 @@ This document outlines security procedures and general policies for this project
 
 ## Reporting a Bug
 
-Report security bugs by emailing the lead maintainer, Anthony anthcor@gmail.com.
+Report security bugs by emailing the lead maintainer, Anthony anthcor+hudson@gmail.com.
 
 The lead maintainer will acknowledge your email within 48 hours, and will send a
 more detailed response within 48 hours indicating the next steps in handling

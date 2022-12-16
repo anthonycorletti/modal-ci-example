@@ -18,10 +18,10 @@ async def test_create_dataset(client: AsyncClient) -> None:
     assert response.status_code == 200
     dataset = response.json()
     assert dataset["name"] == "default"
-    assert dataset["namespace_id"] == namespace["id"]
+    assert dataset["namespace"]["id"] == namespace["id"]
 
 
-async def test_get_dataset(client: AsyncClient) -> None:
+async def test_get_datasets(client: AsyncClient) -> None:
     response = await client.post("/namespaces", json={"name": "default"})
     assert response.status_code == 200
     namespace = response.json()
@@ -33,6 +33,37 @@ async def test_get_dataset(client: AsyncClient) -> None:
     response = await client.get(f"/namespaces/{namespace['id']}/datasets")
     assert response.status_code == 200
     assert len(response.json()) == 1
+
+
+async def test_get_dataset(client: AsyncClient) -> None:
+    response = await client.post("/namespaces", json={"name": "default"})
+    assert response.status_code == 200
+    namespace = response.json()
+    response = await client.post(
+        f"/namespaces/{namespace['id']}/datasets",
+        json={"name": "default", "namespace_id": namespace["id"]},
+    )
+    assert response.status_code == 200
+    dataset = response.json()
+    response = await client.get(
+        f"/namespaces/{namespace['id']}/datasets/{dataset['id']}"
+    )
+    assert response.status_code == 200
+    assert response.json()["name"] == "default"
+    assert response.json()["namespace"]["id"] == namespace["id"]
+
+
+async def test_get_missing_dataset_in_namespace_fails(client: AsyncClient) -> None:
+    response = await client.post("/namespaces", json={"name": "default"})
+    assert response.status_code == 200
+    namespace = response.json()
+    response = await client.get(f"/namespaces/{namespace['id']}/datasets/{uuid4()}")
+    assert response.status_code == 400
+
+
+async def test_missing_dataset_fails(client: AsyncClient) -> None:
+    response = await client.get(f"/namespaces/{uuid4()}/datasets/{uuid4()}")
+    assert response.status_code == 400
 
 
 async def test_get_dataset_name_query(client: AsyncClient) -> None:

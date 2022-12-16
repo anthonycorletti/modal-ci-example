@@ -7,7 +7,7 @@ theme:
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: black
+      primary: slate
       accent: cyan
       toggle:
         icon: material/weather-night
