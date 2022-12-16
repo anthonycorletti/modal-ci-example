@@ -106,8 +106,7 @@ class TopicRead(BaseTopic, UUIDMixin, TimestampsMixin):
 class BaseSubscription(SQLModel):
     name: str
     delivery_type: DeliveryType
-    # TODO: coming soon!
-    # message_retention_duration_minutes: int = Field(..., ge=0, le=7 * 24 * 60)
+    # TODO: message_retention_duration_minutes: int = Field(..., ge=0, le=7 * 24 * 60)
     push_endpoint: Optional[AnyHttpUrl]
 
     @validator("push_endpoint", pre=True, always=True)
