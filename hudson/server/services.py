@@ -1,14 +1,23 @@
 import asyncio
 import base64
+import json
+import os
+import time
+from pathlib import Path
 from typing import List, Optional
 
+import aiofiles
 import httpx
+import polars as pl
 from pydantic import UUID4
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from hudson._types import Message
+from hudson._env import env
+from hudson._types import DataArray, Message
 from hudson.models import (
+    Dataset,
+    DatasetCreate,
     Namespace,
     NamespaceCreate,
     Subscription,
@@ -145,9 +154,9 @@ class TopicsService:
         return topic
 
     async def publish_message(self, topic: Topic, message: Message) -> None:
-        # TODO: right now hudson only supports http-push publishing to HTTPS endpoints
-        # TODO: hudson should support other modes and other protocols,
-        # TODO: e.g. pull, gRPC, etc.
+        # TODO: right now hudson only supports http-push publishing to HTTPS endpoints.
+        # hudson should support other modes and other protocols
+        # e.g. pull, gRPC, carrier pigeon, etc.
         await asyncio.gather(
             *[
                 self.publish_message_to_subscription(
@@ -273,6 +282,109 @@ class SubscriptionsService:
         return subscription
 
 
+class DatasetsService:
+    async def create(
+        self, dataset_create: DatasetCreate, psql: AsyncSession
+    ) -> Dataset:
+        results = await psql.execute(
+            select(Dataset).where(
+                Dataset.name == dataset_create.name,
+                Dataset.namespace_id == dataset_create.namespace_id,
+            )
+        )
+        dataset = results.scalars().first()
+        if dataset is not None:
+            return dataset
+        dataset = Dataset(**dataset_create.dict())
+        psql.add(dataset)
+        await psql.commit()
+        await psql.refresh(dataset)
+        return dataset
+
+    async def create_directory_for_dataset(self, dataset: Dataset) -> None:
+        dataset_path = (
+            Path(env.DATASETS_PATH) / str(dataset.namespace_id) / str(dataset.id)
+        )
+        dataset_path.mkdir(parents=True, exist_ok=True)
+
+    async def write(
+        self, namespace_id: UUID4, dataset_id: UUID4, data_array: DataArray
+    ) -> None:
+        dataset_path = (
+            Path(env.DATASETS_PATH)
+            / str(namespace_id)
+            / str(dataset_id)
+            / f"{int(time.time() * 1000)}.jsonl"
+        )
+        async with aiofiles.open(dataset_path, "w") as f:
+            for d in data_array.data:
+                await f.write(json.dumps(d.dict()))
+        df = pl.read_ndjson(dataset_path)
+        df.write_ipc(dataset_path.with_suffix(".arrow"))
+        os.remove(dataset_path)
+
+    async def list(
+        self,
+        namespace_id: UUID4,
+        name: Optional[str],
+        psql: AsyncSession,
+    ) -> List[Dataset]:
+        if name is not None:
+            results = (
+                (
+                    await psql.execute(
+                        select(Dataset)
+                        .where(
+                            Dataset.namespace_id == namespace_id,
+                            Dataset.name.contains(name),  # type: ignore
+                        )
+                        .order_by(Dataset.name)
+                    )
+                )
+                .scalars()
+                .all()
+            )
+        else:
+            results = (
+                (
+                    await psql.execute(
+                        select(Dataset)
+                        .where(Dataset.namespace_id == namespace_id)
+                        .order_by(Dataset.name)
+                    )
+                )
+                .scalars()
+                .all()
+            )
+        return results
+
+    async def get(
+        self, dataset_id: UUID4, namespace_id: UUID4, psql: AsyncSession
+    ) -> Optional[Dataset]:
+        results = await psql.execute(
+            select(Dataset).where(
+                Dataset.id == dataset_id,
+                Dataset.namespace_id == namespace_id,
+            )
+        )
+        return results.scalars().first()
+
+    async def delete(
+        self, dataset_id: UUID4, namespace_id: UUID4, psql: AsyncSession
+    ) -> Dataset:
+        results = await psql.execute(
+            select(Dataset).where(
+                Dataset.id == dataset_id, Dataset.namespace_id == namespace_id
+            )
+        )
+        dataset = results.scalars().first()
+        if dataset:
+            await psql.delete(dataset)
+            await psql.commit()
+        return dataset
+
+
 namespace_service = NamespaceService()
 topics_service = TopicsService()
 subscriptions_service = SubscriptionsService()
+datasets_service = DatasetsService()

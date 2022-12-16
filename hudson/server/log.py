@@ -58,7 +58,7 @@ class StructuredLogger:
 
 
 class LocalQueueHandler(QueueHandler):
-    def emit(self, record: logging.LogRecord) -> None:
+    def emit(self, record: logging.LogRecord) -> None:  # pragma: no cover
         try:
             self.enqueue(record)
         except asyncio.CancelledError:
@@ -83,7 +83,7 @@ def setup_logging_queue() -> None:
 
     root.addHandler(handler)
     for h in root.handlers[:]:
-        if h is not handler:
+        if h is not handler:  # pragma: no cover
             root.removeHandler(h)
             handlers.append(h)
 

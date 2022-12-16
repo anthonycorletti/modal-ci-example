@@ -66,3 +66,57 @@ async def test_publish_missing_topic_fails(client: AsyncClient) -> None:
         json={"data": "eyJtc2ciOiJoZWxsbyB3b3JsZCEifQo="},
     )
     assert response.status_code == 400
+
+
+async def test_publish_message_too_big_fails(client: AsyncClient) -> None:
+    response = await client.post("/namespaces", json={"name": "default"})
+    assert response.status_code == 200
+    namespace = response.json()
+    response = await client.post(
+        f"/namespaces/{namespace['id']}/topics",
+        json={"name": "default", "namespace_id": namespace["id"]},
+    )
+    assert response.status_code == 200
+    topic = response.json()
+    response = await client.post(
+        f"/namespaces/{namespace['id']}/topics/{topic['id']}/publish",
+        json={
+            "data": base64.b64encode(("A" * 10_000_000).encode("utf8")).decode("utf8")
+        },
+    )
+    assert response.status_code == 422
+    assert response.json() == {
+        "detail": [
+            {
+                "loc": ["body", "data"],
+                "msg": "Message data must be less than or equal to 10MB.",
+                "type": "value_error",
+            }
+        ]
+    }
+
+
+async def test_publish_message_invalid_b64_fails(client: AsyncClient) -> None:
+    response = await client.post("/namespaces", json={"name": "default"})
+    assert response.status_code == 200
+    namespace = response.json()
+    response = await client.post(
+        f"/namespaces/{namespace['id']}/topics",
+        json={"name": "default", "namespace_id": namespace["id"]},
+    )
+    assert response.status_code == 200
+    topic = response.json()
+    response = await client.post(
+        f"/namespaces/{namespace['id']}/topics/{topic['id']}/publish",
+        json={"data": "eyJpbnZhbGlkIjogImpzbw=="},
+    )
+    assert response.status_code == 422
+    assert response.json() == {
+        "detail": [
+            {
+                "loc": ["body", "data"],
+                "msg": "Message data must be a valid base64 encoded JSON string.",
+                "type": "value_error",
+            }
+        ]
+    }

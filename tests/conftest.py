@@ -1,4 +1,5 @@
 import asyncio
+import shutil
 from typing import AsyncGenerator, Generator
 
 import pytest
@@ -10,6 +11,7 @@ from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from typer.testing import CliRunner
 
+from hudson._env import env
 from hudson.db import async_psql_engine
 from hudson.server.main import app as server_app
 
@@ -48,3 +50,9 @@ async def async_db_session() -> AsyncGenerator:
         await conn.run_sync(SQLModel.metadata.drop_all)
 
     await async_psql_engine.dispose()
+
+
+@pytest.fixture(scope="session", autouse=True)
+async def delete_test_database() -> AsyncGenerator:
+    yield
+    shutil.rmtree(env.DATASETS_PATH, ignore_errors=True)

@@ -55,10 +55,15 @@ class Namespace(BaseNamespace, UUIDMixin, TimestampsMixin, table=True):
         back_populates="namespace",
         sa_relationship_kwargs={"lazy": "selectin", "cascade": "all, delete-orphan"},
     )
+    datasets: List["Dataset"] = Relationship(
+        back_populates="namespace",
+        sa_relationship_kwargs={"lazy": "selectin", "cascade": "all, delete-orphan"},
+    )
 
 
 class NamespaceRead(BaseNamespace, UUIDMixin, TimestampsMixin):
     topics: List["Topic"]
+    datasets: List["Dataset"]
 
 
 class BaseTopic(SQLModel):
@@ -137,6 +142,40 @@ class Subscription(BaseSubscription, UUIDMixin, TimestampsMixin, table=True):
 
 class SubscriptionRead(BaseSubscription, UUIDMixin, TimestampsMixin):
     topic: Topic
+
+
+class BaseDataset(SQLModel):
+    name: str
+    description: Optional[str]
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "default",
+                "description": "default dataset",
+            }
+        }
+
+
+class DatasetCreate(BaseDataset):
+    namespace_id: UUID4
+
+
+class Dataset(BaseDataset, UUIDMixin, TimestampsMixin, table=True):
+    __tablename__ = "datasets"
+
+    __table_args__ = (UniqueConstraint("namespace_id", "name"),)
+
+    namespace_id: UUID4 = Field(
+        default=None, foreign_key="namespaces.id", nullable=False
+    )
+    namespace: Namespace = Relationship(
+        back_populates="datasets", sa_relationship_kwargs={"lazy": "selectin"}
+    )
+
+
+class DatasetRead(BaseDataset, UUIDMixin, TimestampsMixin):
+    namespace: Namespace
 
 
 NamespaceRead.update_forward_refs()

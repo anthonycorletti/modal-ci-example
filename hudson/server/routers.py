@@ -9,6 +9,9 @@ from hudson import __version__
 from hudson._types import DataArray, HealthResponse, Message
 from hudson.db import psql_db
 from hudson.models import (
+    Dataset,
+    DatasetCreate,
+    DatasetRead,
     Namespace,
     NamespaceCreate,
     NamespaceRead,
@@ -21,6 +24,7 @@ from hudson.models import (
 )
 from hudson.server.log import log
 from hudson.server.services import (
+    datasets_service,
     namespace_service,
     subscriptions_service,
     topics_service,
@@ -53,7 +57,6 @@ async def create_namespaces(
 
     Args:
         namespace_create (NamespaceCreate): The namespace to create.
-        psql (Session): The database session.
 
     Returns:
         Namespace: The created namespace.
@@ -72,6 +75,9 @@ async def get_namespaces(
 ) -> List[Namespace]:
     """Get all namespaces.
 
+    Args:
+        name (Optional[str], optional): The namespace name. Defaults to None.
+
     Returns:
         List[Namespace]: The namespaces.
     """
@@ -88,7 +94,7 @@ async def delete_namespaces(
         namespace_id (UUID4): The namespace id.
 
     Returns:
-        Optional[Namespace]: The deleted namespace.
+        Namespace: The deleted namespace.
     """
     namespace = await namespace_service.get(namespace_id=namespace_id, psql=psql)
     if namespace is None:
@@ -106,6 +112,7 @@ async def get_topics(
 
     Args:
         namespace_id (UUID4): The namespace id.
+        name (Optional[str], optional): The topic name. Defaults to None.
 
     Returns:
         List[Topic]: The topics.
@@ -215,6 +222,7 @@ async def get_subscriptions(
     Args:
         namespace_id (UUID4): The namespace id.
         topic_id (UUID4): The topic id.
+        name (Optional[str], optional): The subscription name. Defaults to None.
 
     Returns:
         List[Subscription]: The subscriptions.
@@ -307,23 +315,98 @@ async def publish_message_to_topic(
     return await topics_service.publish_message(topic=topic, message=message)
 
 
-@dataset_router.post("/namespaces/{namespace_id}/datasets")
+@dataset_router.post("/namespaces/{namespace_id}/datasets", response_model=Dataset)
 async def create_datasets(
-    namespace_id: UUID4, data_array: DataArray = Body(...)
-) -> None:
-    # TODO: create datasets
-    pass
+    namespace_id: UUID4,
+    dataset_create: DatasetCreate = Body(...),
+    psql: AsyncSession = Depends(psql_db),
+) -> Dataset:
+    """Create a dataset in a namespace.
+
+    Args:
+        namespace_id (UUID4): The namespace id.
+        dataset_create (DatasetCreate): The dataset to create.
+
+    Returns:
+        Dataset: The Dataset
+    """
+    namespace = await namespace_service.get(namespace_id=namespace_id, psql=psql)
+    if namespace is None:
+        raise HTTPException(status_code=400, detail="Namespace not found.")
+    result = await datasets_service.create(dataset_create=dataset_create, psql=psql)
+    # TODO: hudson only supports writing to a dir on a filesystem now
+    # hudson will support writing to s3, gcs, huggingface, etc in the future
+    await datasets_service.create_directory_for_dataset(dataset=result)
+    return result
 
 
-@dataset_router.get("/namespaces/{namespace_id}/datasets")
+@dataset_router.get(
+    "/namespaces/{namespace_id}/datasets", response_model=List[DatasetRead]
+)
 async def get_datasets(
     namespace_id: UUID4,
+    name: Optional[str] = None,
+    psql: AsyncSession = Depends(psql_db),
+) -> List[Dataset]:
+    """Get all datasets in a namespace.
+
+    Args:
+        namespace_id (UUID4): The namespace id.
+        name (Optional[str], optional): The name of the dataset. Defaults to None.
+
+    Returns:
+        List[Dataset]: The datasets.
+    """
+    namespace = await namespace_service.get(namespace_id=namespace_id, psql=psql)
+    if namespace is None:
+        raise HTTPException(status_code=400, detail="Namespace not found.")
+    return await datasets_service.list(name=name, psql=psql, namespace_id=namespace_id)
+
+
+@dataset_router.delete(
+    "/namespaces/{namespace_id}/datasets/{dataset_id}", response_model=Dataset
+)
+async def delete_datasets(
+    namespace_id: UUID4, dataset_id: UUID4, psql: AsyncSession = Depends(psql_db)
+) -> Dataset:
+    """Delete a dataset in a namespace.
+
+    Args:
+        namespace_id (UUID4): The namespace id.
+        dataset_id (UUID4): The dataset id.
+
+    Returns:
+        Dataset.
+    """
+    namespace = await namespace_service.get(namespace_id=namespace_id, psql=psql)
+    if namespace is None:
+        raise HTTPException(status_code=400, detail="Namespace not found.")
+    dataset = await datasets_service.get(
+        dataset_id=dataset_id, namespace_id=namespace_id, psql=psql
+    )
+    if dataset is None:
+        raise HTTPException(status_code=400, detail="Dataset not found.")
+    return await datasets_service.delete(
+        dataset_id=dataset_id, namespace_id=namespace_id, psql=psql
+    )
+
+
+@dataset_router.post(
+    "/namespaces/{namespace_id}/datasets/{dataset_id}/write", response_model=None
+)
+async def write_to_datasets(
+    namespace_id: UUID4, dataset_id: UUID4, data_array: DataArray = Body(...)
 ) -> None:
-    # TODO: get datasets
-    pass
+    """Write to a dataset in a namespace.
 
+    Args:
+        namespace_id (UUID4): The namespace id.
+        dataset_id (UUID4): The dataset id.
+        data_array (DataArray): The data to write.
 
-@dataset_router.delete("/namespaces/{namespace_id}/datasets/{dataset_id}")
-async def delete_datasets(namespace_id: UUID4, dataset_id: UUID4) -> None:
-    # TODO: delete datasets
-    pass
+    Returns:
+        None.
+    """
+    return await datasets_service.write(
+        namespace_id=namespace_id, dataset_id=dataset_id, data_array=data_array
+    )

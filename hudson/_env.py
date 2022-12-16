@@ -39,6 +39,11 @@ class _Env(BaseSettings):
         env="PSQL_POOL_PRE_PING",
         description="The PSQL database pre pool ping.",
     )
+    DATASETS_PATH: str = Field(
+        "/hudson/data",
+        env="DATASETS_PATH",
+        description="The root dir for storing datasets.",
+    )
 
     class Config:
         env_file = ".env", ".env.local"

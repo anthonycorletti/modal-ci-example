@@ -78,7 +78,7 @@ class Message(BaseModel):
         if sys.getsizeof(v) > 10_000_000:
             raise ValueError("Message data must be less than or equal to 10MB.")
         try:
-            json.dumps(base64.b64decode(v.encode("utf-8")).decode("utf-8"))
+            json.loads(base64.b64decode(v.encode("utf-8")).decode("utf-8"))
         except json.JSONDecodeError:
             raise ValueError("Message data must be a valid base64 encoded JSON string.")
         return v
