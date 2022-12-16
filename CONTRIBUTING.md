@@ -65,10 +65,16 @@ Then run the tests. The tests should automatically run migrations for the app.
 
 ## Running hudson
 
-Start postgres
+Start postgres if you haven't done so already.
 
 ```sh
 ./scripts/run-postgres.sh
+```
+
+Run migrations
+
+```sh
+./scripts/alembic-upgrade-head.sh
 ```
 
 Start hudson

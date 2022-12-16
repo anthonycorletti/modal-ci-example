@@ -5,18 +5,18 @@
     <em>Build multi-modal data apps.</em>
 </p>
 <p>
-<a href="https://github.com/anthonycorletti/hudson/actions?query=workflow%3Atest" target="_blank">
-    <img src="https://github.com/anthonycorletti/hudson/workflows/test/badge.svg" alt="Test">
-</a>
-<a href="https://github.com/anthonycorletti/hudson/actions?query=workflow%3Apublish" target="_blank">
-    <img src="https://github.com/anthonycorletti/hudson/workflows/publish/badge.svg" alt="publish">
-</a>
-<a href="https://codecov.io/gh/anthonycorletti/hudson" target="_blank">
-    <img src="https://img.shields.io/codecov/c/github/anthonycorletti/hudson?color=%2334D058" alt="Coverage">
-</a>
-<a href="https://pypi.org/project/hudson/" target="_blank">
-    <img alt="PyPI" src="https://img.shields.io/pypi/v/hudson?color=blue">
-</a>
+    <a href="https://github.com/anthonycorletti/hudson/actions?query=workflow%3Atest" target="_blank">
+        <img src="https://github.com/anthonycorletti/hudson/workflows/test/badge.svg" alt="Test">
+    </a>
+    <a href="https://github.com/anthonycorletti/hudson/actions?query=workflow%3Apublish" target="_blank">
+        <img src="https://github.com/anthonycorletti/hudson/workflows/publish/badge.svg" alt="publish">
+    </a>
+    <a href="https://codecov.io/gh/anthonycorletti/hudson" target="_blank">
+        <img src="https://img.shields.io/codecov/c/github/anthonycorletti/hudson?color=%2334D058" alt="Coverage">
+    </a>
+    <a href="https://pypi.org/project/hudson/" target="_blank">
+        <img alt="PyPI" src="https://img.shields.io/pypi/v/hudson?color=blue">
+    </a>
 </p>
 
 ---
@@ -35,10 +35,10 @@ If you would like to contribute, please read the [contributing guidelines](./con
 
 Some key features of Hudson are
 
-* 🐍 Async Python
-* 🧱 DocArray
-* 🐻‍❄️ Polars
-* ☁️ Modal
-* 📦 Cleanly integrates with your existing Python code (in Python or otherwise!).
-* 📨 A ready-to-use Publish-subscribe architecture.
-* ✍️ Just write code! No configuration needed.
+* 🐍 **Async Python**
+* 🧱 **DocArray**
+* 🐻‍❄️ **Polars**
+* ☁️ **Modal**
+* 🎁 **Cleanly** integrates with your existing code (in Python or otherwise!).
+* 📨 **Publish-subscribe** functionality built in.
+* ✍️ **Just write code!** No YAML needed.
