@@ -64,7 +64,7 @@ pip install hudson
 
 ## Who uses Hudson?
 
-Let [Anthony](https://twitter.com/anthonycorletti) know if you're using Hudson and he'll add you to this list!
+Let [Anthony](https://twitter.com/anthonycorletti) know if you're using Hudson and he'll feature you/ your company here!
 
 ## Contributing & Sponsorship
 

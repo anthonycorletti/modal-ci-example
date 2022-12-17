@@ -4,12 +4,30 @@
 pip install hudson
 ```
 
-## Start Hudson
+## Run postgres and make database migrations
 
-In one shell session, start a new Hudson server and postgres server
+Here's an example of how to run postgres in a docker container. You can also run postgres locally if you prefer.
 
 ```sh
-hudson server # TODO this should also start the database and alembic upgrade head
+docker run --rm -d --name hudson-postgres \
+-p 5432:5432 \
+-e POSTGRES_PASSWORD=hudson \
+-e POSTGRES_USER=hudson \
+-e POSTGRES_PASSWORD=hudson \
+-e POSTGRES_DB=hudson \
+postgres:15.1
+```
+
+Run hudson's database migrations.
+
+```sh
+alembic upgrade head
+```
+
+## Start Hudson
+
+```sh
+hudson server
 ```
 
 ## Run the example
