@@ -1,5 +1,5 @@
 """hudson"""
 
-__version__ = "0.0.0"
+__version__ = "0.0.0a1"
 
-from .client.main import client  # noqa
+from hudson.client.main import hudson_client  # noqa

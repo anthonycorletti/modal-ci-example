@@ -69,7 +69,8 @@ def _deploy(
         help="Filepath reference to the stub to deploy. "
         "Relative the project module root.",
     ),
-) -> None:
+) -> None:  # pragma: no cover
+    """Deploy Hudson to Modal."""
     from modal.cli.app import deploy
 
     deploy(

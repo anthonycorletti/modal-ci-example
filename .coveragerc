@@ -10,5 +10,6 @@ concurrency =
 
 omit =
     *__init__.py
+    hudson/_modal.py
 
 parallel = True

@@ -13,7 +13,7 @@ dynamic = [
     "license",
 ]
 description = "Simple, secure, and scalable orchestration for apps and data on Modal."
-requires-python = ">=3.11"
+requires-python = ">=3.9"
 dependencies = [
     "fastapi >=0.88.0",
     "aiofiles >=0.8.0",
@@ -49,6 +49,7 @@ dev = [
     "ruff >=0.0.183",
     "pre-commit >=2.20.0",
     "types-aiofiles >=0.7.0",
+    "torch >=1.13.0",
 ]
 doc = [
     "mkdocs >=1.4.2",

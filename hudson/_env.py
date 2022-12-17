@@ -50,6 +50,11 @@ class _Env(BaseSettings):
         env="DATASETS_PATH",
         description="The root dir for storing datasets.",
     )
+    TIMEOUT_SECONDS: int = Field(
+        60,
+        env="TIMEOUT_SECONDS",
+        description="The timeout for HTTP requests.",
+    )
 
     class Config:
         env_file = ".env", ".env.local"

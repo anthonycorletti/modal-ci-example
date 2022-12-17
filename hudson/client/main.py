@@ -6,7 +6,7 @@ from httpx._types import HeaderTypes, QueryParamTypes, RequestContent, RequestDa
 from pydantic import UUID4
 
 from hudson._env import env
-from hudson.exc import WriteDatasetException
+from hudson.exc import BaseHudsonException
 from hudson.models import DatasetRead, NamespaceRead
 
 
@@ -24,8 +24,8 @@ class HudsonClient(object):
         params: Optional[QueryParamTypes] = None,
         headers: Optional[HeaderTypes] = None,
     ) -> Any:
-        with Client() as client:
-            response = client.request(
+        with Client() as c:
+            response = c.request(
                 method=method,
                 url=self.url + path,
                 content=content,
@@ -33,9 +33,10 @@ class HudsonClient(object):
                 json=json,
                 params=params,
                 headers=headers,
+                timeout=env.TIMEOUT_SECONDS,
             )
             if not response.is_success:
-                raise WriteDatasetException(response.text)
+                raise BaseHudsonException(response.text)
             return response.json()
 
     def create_namespace(self, name: str) -> NamespaceRead:
@@ -88,5 +89,15 @@ class HudsonClient(object):
         )
         return None
 
+    def read_dataset(
+        self,
+        namespace_id: UUID4,
+        dataset_id: UUID4,
+    ) -> DocumentArray:
+        self.request(
+            method="GET",
+            path=f"/namespaces/{namespace_id}/datasets/{dataset_id}/read",
+        )
 
-client = HudsonClient(url=env.HUDSON_SERVER_URL)
+
+hudson_client = HudsonClient(url=env.HUDSON_SERVER_URL)

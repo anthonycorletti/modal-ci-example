@@ -10,6 +10,7 @@ from typing import List, Optional
 import aiofiles
 import httpx
 import polars as pl
+from docarray import Document, DocumentArray
 from pydantic import UUID4
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -313,22 +314,6 @@ class DatasetsService:
         )
         dataset_path.mkdir(parents=True, exist_ok=True)
 
-    async def write(
-        self, namespace_id: UUID4, dataset_id: UUID4, data_array: DataArray
-    ) -> None:
-        dataset_path = (
-            Path(env.DATASETS_PATH)
-            / str(namespace_id)
-            / str(dataset_id)
-            / f"{int(time.time() * 1000)}.jsonl"
-        )
-        async with aiofiles.open(dataset_path, "w") as f:
-            for d in data_array.data:
-                await f.write(json.dumps(d.dict()))
-        df = pl.read_ndjson(dataset_path)
-        df.write_ipc(dataset_path.with_suffix(".arrow"))
-        os.remove(dataset_path)
-
     async def list(
         self,
         namespace_id: UUID4,
@@ -393,6 +378,34 @@ class DatasetsService:
             shutil.rmtree(dataset_path)
 
         return dataset
+
+    async def write(
+        self, namespace_id: UUID4, dataset_id: UUID4, data_array: DataArray
+    ) -> None:
+        dataset_path = (
+            Path(env.DATASETS_PATH)
+            / str(namespace_id)
+            / str(dataset_id)
+            / f"{int(time.time() * 1000)}.jsonl"
+        )
+        async with aiofiles.open(dataset_path, "w") as f:
+            for d in data_array.data:
+                await f.write(json.dumps(d.dict()))
+        df = pl.read_ndjson(dataset_path)
+        df.write_ipc(dataset_path.with_suffix(".arrow"))
+        os.remove(dataset_path)
+
+    async def read(
+        self,
+        namespace_id: UUID4,
+        dataset_id: UUID4,
+    ) -> DataArray:
+        dataset_path = Path(env.DATASETS_PATH) / str(namespace_id) / str(dataset_id)
+        files = sorted(dataset_path.glob("*.arrow"))
+        if len(files) == 0:
+            return DataArray(data=DocumentArray())
+        df = pl.read_ipc(files[-1])
+        return DataArray(data=DocumentArray([Document(d) for d in df.to_dicts()]))
 
 
 namespace_service = NamespaceService()

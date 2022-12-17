@@ -454,3 +454,22 @@ async def write_to_datasets(
     return await datasets_service.write(
         namespace_id=namespace_id, dataset_id=dataset_id, data_array=data_array
     )
+
+
+@dataset_router.get(
+    "/namespaces/{namespace_id}/datasets/{dataset_id}/read", response_model=DataArray
+)
+async def read_from_datasets(namespace_id: UUID4, dataset_id: UUID4) -> DataArray:
+    """Read from a dataset in a namespace.
+
+    Args:
+        namespace_id (UUID4): The namespace id.
+        dataset_id (UUID4): The dataset id.
+
+    Returns:
+        DataArray.
+    """
+    return await datasets_service.read(
+        namespace_id=namespace_id,
+        dataset_id=dataset_id,
+    )
