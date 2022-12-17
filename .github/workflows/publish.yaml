@@ -1,19 +1,17 @@
-name: test
+name: publish
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    types: [opened, synchronize]
+  release:
+    types:
+      - created
 
 jobs:
-  test:
+  publish:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        python-version: ["3.10", "3.11"]
+        python-version: ["3.11"]
       fail-fast: false
 
     steps:
@@ -33,11 +31,8 @@ jobs:
       - name: install
         run: ./scripts/install.sh
 
-      - name: lint
-        run: ./scripts/lint.sh
+      - name: build
+        run: ./scripts/build.sh
 
-      - name: run postgres
-        run: POSTGRES_DB=hudson_test ./scripts/run-postgres.sh
-
-      - name: test
-        run: ./scripts/test.sh
+      - name: publish
+        run: ./scripts/publish.sh

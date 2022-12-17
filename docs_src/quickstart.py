@@ -48,5 +48,11 @@ client.write_dataset(
 print(f"⏰ Took {time.time() - t0:.2f} seconds to write {n} documents")
 
 
+#
+#   TODO: Read from the dataset
+#
+print("📖 Reading from the dataset")
+
+
 print("🧹 Cleaning up!")
 client.delete_namespace(namespace.id)
