@@ -50,7 +50,7 @@ def _server(
     ),
 ) -> None:
     """Start the Hudson server."""
-    uvicorn.run(
+    uvicorn.run(  # pragma: no cover
         app=APP_IMPORT_STRING,
         port=port,
         host=host,
