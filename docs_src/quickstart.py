@@ -51,16 +51,13 @@ hudson_client.write_dataset(
 print(f"⏰ Took {time.time() - t0:.2f} seconds to write {n} documents")
 
 
-#
-#   TODO: Read from the dataset – no pytorch or docarray
-#   work on the server but pytorch (installed) on the client
-#   (docarray already available!)!
-#
 print("📖 Reading from the dataset")
-ds = hudson_client.read_dataset(
+t0 = time.time()
+da = hudson_client.read_dataset(
     namespace_id=namespace.id,
     dataset_id=dataset.id,
 )
+print(f"⏰ Took {time.time() - t0:.2f} seconds to read {n} documents")
 
 print("🧹 Cleaning up!")
 hudson_client.delete_namespace(namespace.id)

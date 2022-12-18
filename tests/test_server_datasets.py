@@ -189,3 +189,28 @@ async def test_write_to_dataset(client: AsyncClient) -> None:
     # count the number of files in the dataset path for this dataset
     dataset_path = f"{env.DATASETS_PATH}/{namespace['id']}/{dataset['id']}"
     assert len(os.listdir(dataset_path)) == 1
+
+
+async def test_read_from_dataset(client: AsyncClient) -> None:
+    response = await client.post("/namespaces", json={"name": "default"})
+    assert response.status_code == 200
+    namespace = response.json()
+    response = await client.post(
+        f"/namespaces/{namespace['id']}/datasets",
+        json={"name": "default", "namespace_id": namespace["id"]},
+    )
+    assert response.status_code == 200
+    dataset = response.json()
+    da = DocumentArray()
+    da.extend([Document(text="hello"), Document(text="world!")])
+    _json = {"data": [d.dict() for d in da.to_pydantic_model()]}
+    response = await client.post(
+        f"/namespaces/{namespace['id']}/datasets/{dataset['id']}/write",
+        json=_json,
+    )
+    assert response.status_code == 200
+    response = await client.get(
+        f"/namespaces/{namespace['id']}/datasets/{dataset['id']}/read"
+    )
+    assert response.status_code == 200
+    assert response.json() == _json

@@ -1,7 +1,5 @@
 from typing import AsyncGenerator
 
-# TODO: all sqlalchemy imports should be coming from sqlmodel
-# once sqlmodel has full support for async :soon!:
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession

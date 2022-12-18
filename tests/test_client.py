@@ -5,8 +5,9 @@ import pytest
 from docarray import Document, DocumentArray
 
 from hudson import hudson_client
+from hudson._types import DataArray
 from hudson.exc import BaseHudsonException
-from tests.mocks import MockDataset, MockNamespace, MockResponse
+from tests.mocks import MockDataArray, MockDataset, MockNamespace, MockResponse
 
 
 def test_base_exception() -> None:
@@ -105,3 +106,29 @@ async def test_client_returns_error(mock_request: mock.MagicMock) -> None:
             dataset_id=UUID(str(MockDataset["id"])),
             data=DocumentArray([Document(text="hello world")]),
         )
+
+
+@mock.patch(
+    "hudson.client.main.Client.request",
+    return_value=MockResponse(status_code=200, json=MockDataArray),
+)
+async def test_read_dataset(mock_request: mock.MagicMock) -> None:
+    ds = hudson_client.read_dataset(
+        namespace_id=UUID(str(MockNamespace["id"])),
+        dataset_id=UUID(str(MockDataset["id"])),
+    )
+    assert len(ds) == 2  # type: ignore
+
+
+@mock.patch(
+    "hudson.client.main.Client.request",
+    return_value=MockResponse(status_code=200, json=MockDataArray),
+)
+async def test_read_dataset_not_as_document_arr(mock_request: mock.MagicMock) -> None:
+    ds = hudson_client.read_dataset(
+        namespace_id=UUID(str(MockNamespace["id"])),
+        dataset_id=UUID(str(MockDataset["id"])),
+        as_document_array=False,
+    )
+    assert type(ds) == DataArray
+    assert len(ds.data) == 2

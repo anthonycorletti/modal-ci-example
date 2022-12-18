@@ -160,8 +160,8 @@ class TopicsService:
         return topic
 
     async def publish_message(self, topic: Topic, message: Message) -> None:
-        # TODO: right now hudson only supports http-push publishing to HTTPS endpoints.
-        # hudson should support other modes and other protocols
+        # TODO: hudson supports http-push publishing to HTTPS endpoints.
+        # hudson should support other modes and other protocols in the future
         # e.g. pull, gRPC, carrier pigeon, etc.
         await asyncio.gather(
             *[

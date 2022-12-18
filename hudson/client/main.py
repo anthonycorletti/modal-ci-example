@@ -1,6 +1,6 @@
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union
 
-from docarray import DocumentArray
+from docarray import Document, DocumentArray
 from httpx import Client
 from httpx._types import HeaderTypes, QueryParamTypes, RequestContent, RequestData
 from pydantic import UUID4
@@ -94,12 +94,16 @@ class HudsonClient(object):
         self,
         namespace_id: UUID4,
         dataset_id: UUID4,
-    ) -> DataArray:
+        as_document_array: bool = True,
+    ) -> Union[DocumentArray, DataArray]:
         response = self.request(
             method="GET",
             path=f"/namespaces/{namespace_id}/datasets/{dataset_id}/read",
         )
-        return response
+        da = DataArray(**response)
+        if as_document_array:
+            return DocumentArray([Document.from_pydantic_model(d) for d in da.data])
+        return da
 
 
 hudson_client = HudsonClient(url=env.HUDSON_SERVER_URL)
