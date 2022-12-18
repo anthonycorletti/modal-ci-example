@@ -10,7 +10,6 @@ from typing import List, Optional
 import aiofiles
 import httpx
 import polars as pl
-from docarray import Document, DocumentArray
 from pydantic import UUID4
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -400,12 +399,11 @@ class DatasetsService:
         namespace_id: UUID4,
         dataset_id: UUID4,
     ) -> DataArray:
-        dataset_path = Path(env.DATASETS_PATH) / str(namespace_id) / str(dataset_id)
-        files = sorted(dataset_path.glob("*.arrow"))
-        if len(files) == 0:
-            return DataArray(data=DocumentArray())
-        df = pl.read_ipc(files[-1])
-        return DataArray(data=DocumentArray([Document(d) for d in df.to_dicts()]))
+        dataset_path = (
+            Path(env.DATASETS_PATH) / str(namespace_id) / str(dataset_id) / "*.arrow"
+        )
+        df = pl.read_ipc(dataset_path)
+        return DataArray(data=df.to_dicts())
 
 
 namespace_service = NamespaceService()

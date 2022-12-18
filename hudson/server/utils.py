@@ -19,8 +19,8 @@ class _APIRoute(APIRoute):
         original_route_handler = super().get_route_handler()
 
         async def _log(req: RequestLoggerMessage, res: ResponseLoggerMessage) -> None:
-            log.info({"req": json.loads(req.json())})
-            log.info({"res": json.loads(res.json())})
+            log.debug({"req": json.loads(req.json())})
+            log.debug({"res": json.loads(res.json())})
 
         async def custom_route_handler(request: Request) -> Response:
             req = RequestLoggerMessage(**request.__dict__)

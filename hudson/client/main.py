@@ -6,6 +6,7 @@ from httpx._types import HeaderTypes, QueryParamTypes, RequestContent, RequestDa
 from pydantic import UUID4
 
 from hudson._env import env
+from hudson._types import DataArray
 from hudson.exc import BaseHudsonException
 from hudson.models import DatasetRead, NamespaceRead
 
@@ -93,11 +94,12 @@ class HudsonClient(object):
         self,
         namespace_id: UUID4,
         dataset_id: UUID4,
-    ) -> DocumentArray:
-        self.request(
+    ) -> DataArray:
+        response = self.request(
             method="GET",
             path=f"/namespaces/{namespace_id}/datasets/{dataset_id}/read",
         )
+        return response
 
 
 hudson_client = HudsonClient(url=env.HUDSON_SERVER_URL)

@@ -27,33 +27,37 @@ dataset = hudson_client.create_dataset(
 #
 #   Write a DocumentArray to the dataset.
 #
-print("✍️ Writing to the dataset")
-n = 1_000
+print("🧱 Building the dataset")
+n = 100
 str_len = 100
+data = DocumentArray(
+    [
+        Document(
+            text="".join(
+                random.choices(string.ascii_uppercase + string.digits, k=str_len)
+            ),
+            embedding=torch.randn(768),
+        )
+        for _ in range(n)
+    ]
+)
+print("✍️  Writing to the dataset")
 t0 = time.time()
 hudson_client.write_dataset(
     namespace_id=namespace.id,
     dataset_id=dataset.id,
-    data=DocumentArray(
-        [
-            Document(
-                text="".join(
-                    random.choices(string.ascii_uppercase + string.digits, k=str_len)
-                ),
-                embedding=torch.randn(768),
-            )
-        ]
-        * n,
-    ),
+    data=data,
 )
 print(f"⏰ Took {time.time() - t0:.2f} seconds to write {n} documents")
 
 
 #
-#   TODO: Read from the dataset – no pytorch on the server but pytorch on the client!
+#   TODO: Read from the dataset – no pytorch or docarray
+#   work on the server but pytorch (installed) on the client
+#   (docarray already available!)!
 #
 print("📖 Reading from the dataset")
-df = hudson_client.read_dataset(
+ds = hudson_client.read_dataset(
     namespace_id=namespace.id,
     dataset_id=dataset.id,
 )
