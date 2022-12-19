@@ -1,7 +1,9 @@
 from typing import List
 
 import modal
-import tomllib
+
+# TODO: use tomllib when 3.11 can be used with hudson, blocked by torch + others
+import toml
 from fastapi import FastAPI
 
 from hudson._env import _Env
@@ -13,7 +15,7 @@ stub["env"] = modal.Secret(_Env(_env_file=".env").dict())
 
 
 def _get_dependencies() -> List[str]:
-    data = tomllib.load(open("pyproject.toml", "rb"))
+    data = toml.load("pyproject.toml")
     return data["project"]["dependencies"]
 
 
