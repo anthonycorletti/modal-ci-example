@@ -35,4 +35,7 @@ jobs:
         run: ./scripts/build.sh
 
       - name: publish
+        env:
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
         run: ./scripts/publish.sh
