@@ -20,7 +20,11 @@ def _get_dependencies() -> List[str]:
 image = modal.Image.debian_slim().pip_install(_get_dependencies())
 
 
-@stub.asgi(image=image, secret=stub["env"])
+@stub.asgi(
+    image=image,
+    secret=stub["env"],
+    shared_volumes={stub["env"]["DATASETS_PATH"]: modal.SharedVolume()},
+)
 def _app() -> FastAPI:
     return app
 

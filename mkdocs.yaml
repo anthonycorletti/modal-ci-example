@@ -36,6 +36,7 @@ nav:
       - Tabular: examples/tabular.md
       - Images: examples/images.md
       - Audio: examples/audio.md
+  - Building Workflows: building-workflows.md
   - Development & Contributing: contributing.md
   - Release Notes: release-notes.md
 

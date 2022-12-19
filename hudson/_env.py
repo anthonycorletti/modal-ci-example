@@ -20,11 +20,6 @@ class _Env(BaseSettings):
         env="API_SECRET_KEY",
         description="The API secret key.",
     )
-    DUCK_DB: str = Field(
-        "hudson.db",
-        env="DUCK_DB",
-        description="The DuckDB database file.",
-    )
     PSQL_URL: str = Field(
         "postgresql+asyncpg://hudson:hudson@localhost:5432/hudson",
         env="PSQL_URL",
