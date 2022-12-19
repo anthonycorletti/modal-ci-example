@@ -50,6 +50,11 @@ class _Env(BaseSettings):
         env="TIMEOUT_SECONDS",
         description="The timeout for HTTP requests.",
     )
+    MODAL_VOLUME_NAME: str = Field(
+        "hudson-datasets",
+        env="MODAL_VOLUME_NAME",
+        description="The Modal volume name for datasets.",
+    )
 
     class Config:
         env_file = ".env", ".env.local"
