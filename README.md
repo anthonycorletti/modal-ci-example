@@ -29,7 +29,7 @@ _:warning: Hudson is still in alpha and isn't ready for production yet. If you h
 
 ---
 
-Build multi-modal data applications.
+Build multi-modal data applications with ease.
 
 Some major features of Hudson are;
 
