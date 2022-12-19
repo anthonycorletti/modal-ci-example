@@ -20,9 +20,7 @@ def _get_dependencies() -> List[str]:
     return data["project"]["dependencies"]
 
 
-deps = _get_dependencies()
-
-image = modal.Image.debian_slim().pip_install(deps)
+image = modal.Image.debian_slim().pip_install(_get_dependencies())
 
 
 @stub.asgi(

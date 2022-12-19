@@ -20,7 +20,7 @@ theme:
         icon: material/weather-sunny
         name: Switch to light mode
   icon:
-    repo: material/sail-boat
+    repo: fontawesome/brands/github-alt
     logo: material/sail-boat
     favicon: material/sail-boat
 
