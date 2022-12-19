@@ -11,7 +11,8 @@ from hudson.server.main import app
 
 stub = modal.Stub()
 
-stub["env"] = modal.Secret(_Env(_env_file=".env").dict())
+_s = _Env(_env_file=".env")
+stub["env"] = modal.Secret(_s.to_modal_secret())
 
 
 def _get_dependencies() -> List[str]:
@@ -26,9 +27,7 @@ image = modal.Image.debian_slim().pip_install(_get_dependencies())
     image=image,
     secret=stub["env"],
     shared_volumes={
-        stub["env"]["DATASETS_PATH"]: modal.SharedVolume().persist(
-            stub["env"]["MODAL_VOLUME_NAME"]
-        )
+        _s.DATASETS_PATH: modal.SharedVolume().persist(_s.MODAL_VOLUME_NAME)
     },
 )
 def _app() -> FastAPI:

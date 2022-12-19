@@ -6,16 +6,16 @@
 </p>
 <p align="center">
     <a href="https://github.com/anthonycorletti/hudson/actions?query=workflow%3Atest" target="_blank">
-        <img src="https://github.com/anthonycorletti/hudson/workflows/test/badge.svg" alt="Test">
+        <img src="https://github.com/anthonycorletti/hudson/workflows/test/badge.svg" alt="test">
     </a>
     <a href="https://github.com/anthonycorletti/hudson/actions?query=workflow%3Apublish" target="_blank">
         <img src="https://github.com/anthonycorletti/hudson/workflows/publish/badge.svg" alt="publish">
     </a>
     <a href="https://codecov.io/gh/anthonycorletti/hudson" target="_blank">
-        <img src="https://img.shields.io/codecov/c/github/anthonycorletti/hudson?color=%2334D058" alt="Coverage">
+        <img src="https://codecov.io/gh/anthonycorletti/hudson/branch/main/graph/badge.svg?token=2K8O7U59KH" alt="coverage">
     </a>
     <a href="https://pypi.org/project/hudson/" target="_blank">
-        <img alt="PyPI" src="https://img.shields.io/pypi/v/hudson?color=blue">
+        <img alt="pypi" src="https://img.shields.io/pypi/v/hudson?color=blue">
     </a>
 </p>
 

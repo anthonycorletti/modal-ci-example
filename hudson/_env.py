@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import Dict
 
 from pydantic import BaseSettings, Field
 
@@ -55,6 +56,15 @@ class _Env(BaseSettings):
         env="MODAL_VOLUME_NAME",
         description="The Modal volume name for datasets.",
     )
+
+    def to_modal_secret(self) -> Dict[str, str]:
+        _result = self.dict()
+        for k, v in _result.items():
+            if isinstance(v, bool):
+                _result[k] = str(v).lower()
+            elif not isinstance(v, str):
+                _result[k] = str(v)
+        return _result
 
     class Config:
         env_file = ".env", ".env.local"
