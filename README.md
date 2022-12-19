@@ -21,7 +21,7 @@
 
 ---
 
-_:warning: Hudson is still in alpha and shouldn't be used for production yet. If you have any questions, feedback, or feature suggestions, please [create an issue on Github](https://github.com/anthonycorletti/hudson/issues/new/choose)._
+_:warning: Hudson is still in alpha and shouldn't be used in production yet. If you have any questions, feedback, or feature suggestions, please [create an issue on Github](https://github.com/anthonycorletti/hudson/issues/new/choose)._
 
 **Documentation**: <a href="https://hudson.corletti.xyz" target="_blank">https://hudson.corletti.xyz</a>
 
