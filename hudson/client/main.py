@@ -56,12 +56,19 @@ class HudsonClient(object):
         response = self.request(method="GET", path="/namespaces", params={"name": name})
         return [NamespaceRead(**item) for item in response]
 
-    def create_dataset(self, namespace_id: UUID4, name: str) -> DatasetRead:
+    def create_dataset(
+        self, namespace_id: UUID4, name: str, description: Optional[str] = None
+    ) -> DatasetRead:
+        _json = {"name": name, "namespace_id": str(namespace_id)}
+        if description is not None:
+            _json["description"] = description
+
         response = self.request(
             method="POST",
             path=f"/namespaces/{namespace_id}/datasets",
-            json={"name": name, "namespace_id": str(namespace_id)},
+            json=_json,
         )
+
         return DatasetRead(**response)
 
     def get_dataset(self, namespace_id: UUID4, dataset_id: UUID4) -> DatasetRead:

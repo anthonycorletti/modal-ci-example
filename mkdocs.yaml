@@ -1,5 +1,5 @@
 site_name: Hudson
-site_description: Simple, secure, and scalable orchestration for multi-modal data apps on Modal.
+site_description: Build multi-modal data applications with ease.
 site_url: https://hudson.corletti.xyz
 
 theme:
@@ -31,6 +31,11 @@ edit_uri: ""
 nav:
   - Welcome: index.md
   - Quickstart: quickstart.md
+  - Examples:
+      - Text: examples/text.md
+      - Tabular: examples/tabular.md
+      - Images: examples/images.md
+      - Audio: examples/audio.md
   - Development & Contributing: contributing.md
   - Release Notes: release-notes.md
 

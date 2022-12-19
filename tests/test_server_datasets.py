@@ -21,6 +21,25 @@ async def test_create_dataset(client: AsyncClient) -> None:
     assert dataset["namespace"]["id"] == namespace["id"]
 
 
+async def test_create_dataset_with_description(client: AsyncClient) -> None:
+    response = await client.post("/namespaces", json={"name": "default"})
+    assert response.status_code == 200
+    namespace = response.json()
+    response = await client.post(
+        f"/namespaces/{namespace['id']}/datasets",
+        json={
+            "name": "default",
+            "namespace_id": namespace["id"],
+            "description": "test",
+        },
+    )
+    assert response.status_code == 200
+    dataset = response.json()
+    assert dataset["name"] == "default"
+    assert dataset["namespace"]["id"] == namespace["id"]
+    assert dataset["description"] == "test"
+
+
 async def test_get_datasets(client: AsyncClient) -> None:
     response = await client.post("/namespaces", json={"name": "default"})
     assert response.status_code == 200

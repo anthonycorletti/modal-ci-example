@@ -1,4 +1,3 @@
-# coming soon!
 import time
 
 from docarray import Document, DocumentArray
@@ -10,7 +9,7 @@ from hudson import hudson_client
 #
 print("🎉 Creating a namespace")
 namespace = hudson_client.create_namespace(
-    name="audio-example",
+    name="video-example",
 )
 
 #
@@ -19,7 +18,7 @@ namespace = hudson_client.create_namespace(
 print("🎉 Creating a dataset")
 dataset = hudson_client.create_dataset(
     namespace_id=namespace.id,
-    name="audio-example-dataset",
+    name="video-example-dataset",
 )
 
 #
@@ -28,7 +27,7 @@ dataset = hudson_client.create_dataset(
 print("🧱 Building the dataset")
 n = 100
 data = DocumentArray(
-    [Document(uri="https://docarray.jina.ai/_static/hello.wav") for _ in range(n)]
+    [Document(uri="https://docarray.jina.ai/_static/mov_bbb.mp4") for _ in range(n)]
 )
 
 print("✍️  Writing to the dataset")

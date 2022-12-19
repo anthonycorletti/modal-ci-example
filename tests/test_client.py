@@ -63,6 +63,19 @@ async def test_create_dataset(mock_request: mock.MagicMock) -> None:
     "hudson.client.main.Client.request",
     return_value=MockResponse(status_code=200, json=MockDataset),
 )
+async def test_create_dataset_with_description(mock_request: mock.MagicMock) -> None:
+    _ds = MockDataset.copy()
+    _ds["description"] = "test"
+    mock_request.return_value._json = _ds
+    ds = hudson_client.create_dataset(UUID(str(MockNamespace["id"])), "default", "test")
+    assert ds.name == "default"
+    assert ds.description == "test"
+
+
+@mock.patch(
+    "hudson.client.main.Client.request",
+    return_value=MockResponse(status_code=200, json=MockDataset),
+)
 async def test_get_dataset(mock_request: mock.MagicMock) -> None:
     ds = hudson_client.get_dataset(
         namespace_id=UUID(str(MockNamespace["id"])),

@@ -12,7 +12,7 @@ dynamic = [
     "readme",
     "license",
 ]
-description = "Simple, secure, and scalable orchestration for apps and data on Modal."
+description = "Build multi-modal data applications with ease."
 requires-python = ">=3.9"
 dependencies = [
     "fastapi >=0.88.0",
