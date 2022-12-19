@@ -21,7 +21,7 @@
 
 ---
 
-_:warning: Hudson is still in alpha and isn't ready for production yet. If you have any questions, feedback, or feature suggestions, please reach out to [Anthony on Twitter](https://twitter.com/anthonycorletti)._
+_:warning: Hudson is still in alpha and shouldn't be used for production yet. If you have any questions, feedback, or feature suggestions, please [create an issue on Github](https://github.com/anthonycorletti/hudson/issues/new/choose)._
 
 **Documentation**: <a href="https://hudson.corletti.xyz" target="_blank">https://hudson.corletti.xyz</a>
 
@@ -48,11 +48,9 @@ Hudson runs as a server-side application and provides a REST API for your applic
 
 ## Use cases
 
-_coming soon!_
-
-## How does Hudson work?
-
-_coming soon!_
+1. **Multi-modal data analytics**: One way to work with data across any modality.
+1. **Processing data in the cloud**: Build data processing pipelines with ease – no need to worry about infrastructure, plugging different cloud tools together, or writing code to support each modality.
+1. **Machine learning data analytics**: Send data from your machine learning workflow to Hudson for processing and analysis. It already works with any modality and framework – you just have to send in the data and embeddings and that's it!
 
 ## Installing Hudson
 
@@ -61,10 +59,6 @@ Hudson is available on PyPI. You can install it with pip:
 ```sh
 pip install hudson
 ```
-
-## Who uses Hudson?
-
-Let [Anthony](https://twitter.com/anthonycorletti) know if you're using Hudson and he'll feature you/ your company here!
 
 ## Contributing & Sponsorship
 
