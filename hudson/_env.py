@@ -74,3 +74,8 @@ class _Env(BaseSettings):
 env = _Env()
 if "pytest" in "".join(sys.argv):
     env = _Env(_env_file=".env.test")
+
+# if the ENV_FILE environment variable is set, use it
+# this is useful for running alembic migrations against remote databases
+if os.environ["ENV_FILE"] is not None:
+    env = _Env(_env_file=os.environ["ENV_FILE"])

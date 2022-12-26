@@ -89,3 +89,11 @@ Check that hudson is running
 $ curl -s "http://localhost:8000/healthcheck" | jq .message
 "⛵️"
 ```
+
+## Running migrations against remote databases
+
+Just specify the `ENV_FILE` environment variable with the proper contents.
+
+```sh
+ENV_FILE=".env" alembic upgrade head
+```
