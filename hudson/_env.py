@@ -77,5 +77,5 @@ if "pytest" in "".join(sys.argv):
 
 # if the ENV_FILE environment variable is set, use it
 # this is useful for running alembic migrations against remote databases
-if os.environ["ENV_FILE"] is not None:
-    env = _Env(_env_file=os.environ["ENV_FILE"])
+if os.getenv("ENV_FILE") is not None:
+    env = _Env(_env_file=os.environ["ENV_FILE"])  # pragma: no cover
