@@ -31,6 +31,7 @@ dependencies = [
     "greenlet >=2.0.1",
     "polars >=0.15.6",
     "pyarrow >=10.0.1",
+    "watchfiles >=0.18.1",
 ]
 [[project.authors]]
 name = "Anthony Corletti"
