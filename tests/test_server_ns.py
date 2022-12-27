@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from httpx import AsyncClient
 
-from hudson._env import env
+from hudson.settings import env
 
 
 async def test_create_namespace(client: AsyncClient) -> None:

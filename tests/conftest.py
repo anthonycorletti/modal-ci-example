@@ -11,9 +11,9 @@ from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from typer.testing import CliRunner
 
-from hudson._env import env
 from hudson.db import async_psql_engine
 from hudson.server.main import app as server_app
+from hudson.settings import env
 
 
 @pytest.fixture(scope="function")

@@ -5,10 +5,10 @@ from httpx import Client
 from httpx._types import HeaderTypes, QueryParamTypes, RequestContent, RequestData
 from pydantic import UUID4
 
-from hudson._env import env
 from hudson._types import DataArray
 from hudson.exc import BaseHudsonException
 from hudson.models import DatasetRead, NamespaceRead
+from hudson.settings import env
 
 
 class HudsonClient(object):
