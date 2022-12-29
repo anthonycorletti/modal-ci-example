@@ -19,6 +19,7 @@ from hudson.models import DatasetRead, NamespaceRead
 class HudsonClient:
     def __init__(self, url: str) -> None:
         self.url = url
+        self.client_watch_dir = config.client_watch_dir
 
     def request(
         self,
@@ -150,12 +151,10 @@ class HudsonClient:
     def _handle_watch_added(self, path: str) -> None:
         if path.endswith(".jsonl"):
             self._handle_watch_added_jsonl(path)
-        elif path.endswith(".csv"):
-            self._handle_watch_added_csv(path)
         else:
-            raise ValueError(f"Unknown file type: {path}")
+            raise ValueError(f"Unsupported file type: {path}")
 
-    def _upload_data_if_needed(self, path: str, data: DocumentArray) -> None:
+    def _upload_data_if_valid(self, path: str, data: DocumentArray) -> None:
         if len(data) >= config.min_batch_upload_size:
             assert (
                 config.namespace_id is not None and config.dataset_id is not None
@@ -171,30 +170,18 @@ class HudsonClient:
     def _handle_watch_added_jsonl(self, path: str) -> None:
         with open(path, "r") as f:
             data = [Document.from_json(json.loads(line)) for line in f.readlines()]
-        self._upload_data_if_needed(path=path, data=DocumentArray(data))
-
-    def _handle_watch_added_csv(self, path: str) -> None:
-        with open(path, "r") as f:
-            data = DocumentArray.from_csv(f)
-        self._upload_data_if_needed(path=path, data=data)
+        self._upload_data_if_valid(path=path, data=DocumentArray(data))
 
     def _handle_watch_modified(self, path: str) -> None:
         if path.endswith(".jsonl"):
             self._handle_watch_modified_jsonl(path)
-        elif path.endswith(".csv"):
-            self._handle_watch_modified_csv(path)
         else:
-            raise ValueError(f"Unknown file type: {path}")
+            raise ValueError(f"Unsupported file type: {path}")
 
     def _handle_watch_modified_jsonl(self, path: str) -> None:
         with open(path, "r") as f:
             data = [Document.from_json(json.loads(line)) for line in f.readlines()]
-        self._upload_data_if_needed(path=path, data=DocumentArray(data))
-
-    def _handle_watch_modified_csv(self, path: str) -> None:
-        with open(path, "r") as f:
-            data = DocumentArray.from_csv(f)
-        self._upload_data_if_needed(path=path, data=data)
+        self._upload_data_if_valid(path=path, data=DocumentArray(data))
 
     def watch(self, watch_dir: Optional[str] = None) -> None:
         t = threading.Thread(
