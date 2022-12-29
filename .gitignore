@@ -108,6 +108,7 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
 .venv
 env/
 venv/
@@ -149,3 +150,4 @@ tmp/
 
 # hudson
 hudson_test_datasets
+.hudson/
