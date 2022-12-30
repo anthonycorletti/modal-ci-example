@@ -15,7 +15,7 @@ def test_base_exception() -> None:
 
 
 @mock.patch(
-    "hudson.client.main.Client.request",
+    "hudson.client.Client.request",
     return_value=MockResponse(status_code=200, json=MockNamespace),
 )
 async def test_create_namespace(mock_request: mock.MagicMock) -> None:
@@ -24,7 +24,7 @@ async def test_create_namespace(mock_request: mock.MagicMock) -> None:
 
 
 @mock.patch(
-    "hudson.client.main.Client.request",
+    "hudson.client.Client.request",
     return_value=MockResponse(status_code=200, json=MockNamespace),
 )
 async def test_get_namespace(mock_request: mock.MagicMock) -> None:
@@ -33,7 +33,7 @@ async def test_get_namespace(mock_request: mock.MagicMock) -> None:
 
 
 @mock.patch(
-    "hudson.client.main.Client.request",
+    "hudson.client.Client.request",
     return_value=MockResponse(status_code=200, json=MockNamespace),
 )
 async def test_delete_namespace(mock_request: mock.MagicMock) -> None:
@@ -42,7 +42,7 @@ async def test_delete_namespace(mock_request: mock.MagicMock) -> None:
 
 
 @mock.patch(
-    "hudson.client.main.Client.request",
+    "hudson.client.Client.request",
     return_value=MockResponse(status_code=200, json=[MockNamespace]),
 )
 async def test_list_namespaces(mock_request: mock.MagicMock) -> None:
@@ -51,7 +51,7 @@ async def test_list_namespaces(mock_request: mock.MagicMock) -> None:
 
 
 @mock.patch(
-    "hudson.client.main.Client.request",
+    "hudson.client.Client.request",
     return_value=MockResponse(status_code=200, json=MockDataset),
 )
 async def test_create_dataset(mock_request: mock.MagicMock) -> None:
@@ -60,7 +60,7 @@ async def test_create_dataset(mock_request: mock.MagicMock) -> None:
 
 
 @mock.patch(
-    "hudson.client.main.Client.request",
+    "hudson.client.Client.request",
     return_value=MockResponse(status_code=200, json=MockDataset),
 )
 async def test_create_dataset_with_description(mock_request: mock.MagicMock) -> None:
@@ -73,7 +73,7 @@ async def test_create_dataset_with_description(mock_request: mock.MagicMock) -> 
 
 
 @mock.patch(
-    "hudson.client.main.Client.request",
+    "hudson.client.Client.request",
     return_value=MockResponse(status_code=200, json=MockDataset),
 )
 async def test_get_dataset(mock_request: mock.MagicMock) -> None:
@@ -85,7 +85,7 @@ async def test_get_dataset(mock_request: mock.MagicMock) -> None:
 
 
 @mock.patch(
-    "hudson.client.main.Client.request",
+    "hudson.client.Client.request",
     return_value=MockResponse(status_code=200, json=MockDataset),
 )
 async def test_delete_dataset(mock_request: mock.MagicMock) -> None:
@@ -97,7 +97,7 @@ async def test_delete_dataset(mock_request: mock.MagicMock) -> None:
 
 
 @mock.patch(
-    "hudson.client.main.Client.request",
+    "hudson.client.Client.request",
     return_value=MockResponse(status_code=200),
 )
 async def test_write_dataset(mock_request: mock.MagicMock) -> None:
@@ -109,7 +109,7 @@ async def test_write_dataset(mock_request: mock.MagicMock) -> None:
 
 
 @mock.patch(
-    "hudson.client.main.Client.request",
+    "hudson.client.Client.request",
     return_value=MockResponse(status_code=500, text="Internal Server Error"),
 )
 async def test_client_returns_error(mock_request: mock.MagicMock) -> None:
@@ -122,7 +122,7 @@ async def test_client_returns_error(mock_request: mock.MagicMock) -> None:
 
 
 @mock.patch(
-    "hudson.client.main.Client.request",
+    "hudson.client.Client.request",
     return_value=MockResponse(status_code=200, json=MockDataArray),
 )
 async def test_read_dataset(mock_request: mock.MagicMock) -> None:
@@ -134,7 +134,7 @@ async def test_read_dataset(mock_request: mock.MagicMock) -> None:
 
 
 @mock.patch(
-    "hudson.client.main.Client.request",
+    "hudson.client.Client.request",
     return_value=MockResponse(status_code=200, json=MockDataArray),
 )
 async def test_read_dataset_not_as_document_arr(mock_request: mock.MagicMock) -> None:

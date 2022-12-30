@@ -33,7 +33,7 @@ hudson_client.watch()
 #
 #   Write data where hudson is watching.
 #
-print("✍️ Writing to the dataset")
+print("✍️  Writing to the watch location")
 n = 100
 str_len = 100
 with open(f"{hudson_client.client_watch_dir}/data-{int(time.time())}.jsonl", "w") as f:
@@ -44,8 +44,14 @@ with open(f"{hudson_client.client_watch_dir}/data-{int(time.time())}.jsonl", "w"
             ),
             embedding=torch.randn(768),
         )
-        f.write(doc.json() + "\n")
+        f.write(doc.to_json() + "\n")
 
+time.sleep(1)
+#
+#   Tell Hudson to stop watching for data.
+#
+print("👀 Stopped watching for data")
+hudson_client.stop()
 
 # print("📖 Reading from the dataset")
 # t0 = time.time()
@@ -54,6 +60,7 @@ with open(f"{hudson_client.client_watch_dir}/data-{int(time.time())}.jsonl", "w"
 #     dataset_id=dataset.id,
 # )
 # print(f"⏰ Took {time.time() - t0:.2f} seconds to read {n} documents")
+
 
 # print("🧹 Cleaning up!")
 # hudson_client.delete_namespace(namespace.id)

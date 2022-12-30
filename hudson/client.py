@@ -1,7 +1,7 @@
-import json
 import os
 import threading
 from multiprocessing import active_children
+from pathlib import Path
 from typing import Any, List, Optional, Union
 
 from docarray import Document, DocumentArray
@@ -11,7 +11,7 @@ from pydantic import UUID4
 from watchfiles import Change, watch
 
 from hudson._types import DataArray
-from hudson.client.config import config
+from hudson.config import config
 from hudson.exc import BaseHudsonException
 from hudson.models import DatasetRead, NamespaceRead
 
@@ -154,8 +154,12 @@ class HudsonClient:
         else:
             raise ValueError(f"Unsupported file type: {path}")
 
-    def _upload_data_if_valid(self, path: str, data: DocumentArray) -> None:
-        if len(data) >= config.min_batch_upload_size:
+    def _upload_data_if_valid(
+        self, path: str, data: DocumentArray, is_last_upload: Optional[bool] = None
+    ) -> None:
+        if is_last_upload is None:
+            is_last_upload = False
+        if (len(data) >= config.min_batch_upload_size) or is_last_upload:
             assert (
                 config.namespace_id is not None and config.dataset_id is not None
             ), "Namespace and dataset must be set before writing data. "
@@ -169,7 +173,7 @@ class HudsonClient:
 
     def _handle_watch_added_jsonl(self, path: str) -> None:
         with open(path, "r") as f:
-            data = [Document.from_json(json.loads(line)) for line in f.readlines()]
+            data = [Document.from_json(line) for line in f.readlines()]
         self._upload_data_if_valid(path=path, data=DocumentArray(data))
 
     def _handle_watch_modified(self, path: str) -> None:
@@ -180,7 +184,7 @@ class HudsonClient:
 
     def _handle_watch_modified_jsonl(self, path: str) -> None:
         with open(path, "r") as f:
-            data = [Document.from_json(json.loads(line)) for line in f.readlines()]
+            data = [Document.from_json(line) for line in f.readlines()]
         self._upload_data_if_valid(path=path, data=DocumentArray(data))
 
     def watch(self, watch_dir: Optional[str] = None) -> None:
@@ -195,6 +199,17 @@ class HudsonClient:
             if process.name == "hudson_watcher":
                 process.terminate()
         return None
+
+    def _handle_final_jsonl_uploads(self, path: str, is_last_upload: bool) -> None:
+        with open(path, "r") as f:
+            data = [Document.from_json(line) for line in f.readlines()]
+        self._upload_data_if_valid(path=path, data=data, is_last_upload=is_last_upload)
+
+    def stop(self) -> None:
+        self._stop_watch()
+        if config.namespace_id is not None and config.dataset_id is not None:
+            for path in Path(config.client_watch_dir).glob("*.jsonl"):
+                self._handle_final_jsonl_uploads(path=str(path), is_last_upload=True)
 
 
 hudson_client = HudsonClient(url=config.server_url)
