@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 from typing import Dict, Optional
 
-from pydantic import UUID4, AnyUrl, BaseModel, Field, StrictInt, StrictStr
+from pydantic import UUID4, BaseModel, Field, StrictInt, StrictStr
 
 
 class HudsonClientConfig(BaseModel):
@@ -18,7 +18,7 @@ class HudsonClientConfig(BaseModel):
     dataset_id: Optional[UUID4] = Field(
         description="The dataset ID",
     )
-    server_url: AnyUrl = Field(
+    server_url: StrictStr = Field(
         default="http://localhost:8000",
         description="The hudson server URL",
     )
@@ -53,6 +53,8 @@ class HudsonClientConfig(BaseModel):
 
     def _save_config(self) -> None:
         data = json.loads(self.json())
+        # if the config file dir doesn't exist, create it
+        Path(os.path.dirname(self.config_path)).mkdir(parents=True, exist_ok=True)
         with open(self.config_path, "w") as f:
             json.dump(data, f)
 
