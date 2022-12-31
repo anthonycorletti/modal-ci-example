@@ -35,6 +35,7 @@ health_router = APIRouter(route_class=_APIRoute, tags=["health"])
 dataset_router = APIRouter(route_class=_APIRoute, tags=["dataset"])
 namespace_router = APIRouter(route_class=_APIRoute, tags=["namespace"])
 pubsub_router = APIRouter(route_class=_APIRoute, tags=["pubsub"])
+# TODO: make router paths extendable by apis that might import hudson
 
 
 @health_router.get("/healthcheck", response_model=HealthResponse)
