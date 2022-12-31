@@ -156,7 +156,7 @@ class HudsonClient:
                     ): f"{watch_dir}/{file}"
                     for file in os.listdir(watch_dir)
                 }
-                # TODO: coverage this is not covered by tests currently
+                # TODO: coverage: this is not covered by tests currently
                 # have to figure out how to make sure pytest can collect
                 # coverage here. think it has something to do with the fact
                 # that this is a thread
@@ -200,7 +200,7 @@ class HudsonClient:
                 path = future_to_path[future]
                 try:
                     result = future.result()
-                # TODO: coverage this has been tricky to cover too
+                # TODO: coverage: this has been tricky to cover too
                 except Exception as exc:  # pragma: no cover
                     raise BaseHudsonException(
                         "Exception raised during stop._case_and_upload for "
