@@ -1,4 +1,5 @@
 import asyncio
+import os
 import shutil
 from typing import AsyncGenerator, Generator
 
@@ -11,6 +12,7 @@ from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from typer.testing import CliRunner
 
+from hudson.config import config
 from hudson.db import async_psql_engine
 from hudson.server.main import app as server_app
 from hudson.settings import env
@@ -59,3 +61,17 @@ async def async_db_session() -> AsyncGenerator:
 async def delete_test_database() -> AsyncGenerator:
     yield
     shutil.rmtree(env.DATASETS_PATH, ignore_errors=True)
+
+
+async def _reset_client_config() -> None:
+    if os.path.exists(config.config_path):
+        os.remove(config.config_path)
+    if os.path.exists(config.client_watch_dir):
+        shutil.rmtree(config.client_watch_dir)
+
+
+@pytest.fixture(scope="function", autouse=True)
+async def reset_client_config() -> AsyncGenerator:
+    await _reset_client_config()
+    yield
+    await _reset_client_config()

@@ -13,9 +13,6 @@ from hudson.config import config
 from hudson.exc import BaseHudsonException
 from hudson.models import DatasetRead, NamespaceRead
 
-pool = ThreadPoolExecutor(max_workers=5, thread_name_prefix="watcher-pool")
-cleanup_pool = ThreadPoolExecutor(max_workers=5, thread_name_prefix="cleanup-pool")
-
 
 class HudsonClient:
     def __init__(self, url: str) -> None:
@@ -52,12 +49,8 @@ class HudsonClient:
     def create_namespace(self, name: str) -> NamespaceRead:
         response = self.request(method="POST", path="/namespaces", json={"name": name})
         config.namespace_id = UUID4(str(response["id"]))
-        config.save_config()
+        config.save()
         return NamespaceRead(**response)
-
-    def set_namespace_id(self, namespace_id: UUID4) -> None:
-        config.namespace_id = namespace_id
-        config.save_config()
 
     def get_namespace(self, namespace_id: UUID4) -> NamespaceRead:
         response = self.request(method="GET", path=f"/namespaces/{namespace_id}")
@@ -67,7 +60,7 @@ class HudsonClient:
         response = self.request(method="DELETE", path=f"/namespaces/{namespace_id}")
         config.namespace_id = None
         config.dataset_id = None
-        config.save_config()
+        config.save()
         return NamespaceRead(**response)
 
     def list_namespaces(self, name: str) -> List[NamespaceRead]:
@@ -89,7 +82,7 @@ class HudsonClient:
 
         config.namespace_id = namespace_id
         config.dataset_id = UUID4(str(response["id"]))
-        config.save_config()
+        config.save()
         return DatasetRead(**response)
 
     def get_dataset(self, namespace_id: UUID4, dataset_id: UUID4) -> DatasetRead:
@@ -103,7 +96,7 @@ class HudsonClient:
             method="DELETE", path=f"/namespaces/{namespace_id}/datasets/{dataset_id}"
         )
         config.dataset_id = None
-        config.save_config()
+        config.save()
         return DatasetRead(**response)
 
     def write_dataset(
@@ -154,6 +147,7 @@ class HudsonClient:
                 return None
 
     def _watch(self, watch_dir: str) -> None:
+        pool = ThreadPoolExecutor(max_workers=5, thread_name_prefix="watcher-pool")
         with pool as executor:
             while self._run_watch:
                 future_to_path = {
@@ -162,7 +156,11 @@ class HudsonClient:
                     ): f"{watch_dir}/{file}"
                     for file in os.listdir(watch_dir)
                 }
-                for future in as_completed(future_to_path):
+                # TODO: coverage this is not covered by tests currently
+                # have to figure out how to make sure pytest can collect
+                # coverage here. think it has something to do with the fact
+                # that this is a thread
+                for future in as_completed(future_to_path):  # pragma: no cover
                     path = future_to_path[future]
                     try:
                         result = future.result()
@@ -177,7 +175,8 @@ class HudsonClient:
 
     def watch(self, watch_dir: Optional[str] = None) -> None:
         if watch_dir is None:
-            watch_dir = str(self.client_watch_dir)
+            watch_dir = self.client_watch_dir
+        os.makedirs(watch_dir, exist_ok=True)
         t = threading.Thread(target=self._watch, args=(watch_dir,), name="watcher-main")
         t.start()
 
@@ -187,6 +186,9 @@ class HudsonClient:
             if thread.name == "watcher-main":
                 thread.join()
         # for any file leftover in the watch_dir, upload it
+        cleanup_pool = ThreadPoolExecutor(
+            max_workers=5, thread_name_prefix="cleanup-pool"
+        )
         with cleanup_pool as executor:
             future_to_path = {
                 executor.submit(
@@ -198,7 +200,8 @@ class HudsonClient:
                 path = future_to_path[future]
                 try:
                     result = future.result()
-                except Exception as exc:
+                # TODO: coverage this has been tricky to cover too
+                except Exception as exc:  # pragma: no cover
                     raise BaseHudsonException(
                         "Exception raised during stop._case_and_upload for "
                         f"{path}: {exc}"

@@ -68,6 +68,7 @@ da = hudson_client.read_dataset(
     dataset_id=dataset.id,
 )
 assert isinstance(da, DocumentArray)
+assert len(da) == n * num_batches
 print(f"⏰ Took {time.time() - t0:.2f} seconds to read {len(da)} documents")
 
 #

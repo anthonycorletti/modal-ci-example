@@ -1,3 +1,5 @@
+import random
+import string
 from unittest import mock
 from uuid import UUID
 
@@ -145,3 +147,108 @@ async def test_read_dataset_not_as_document_arr(mock_request: mock.MagicMock) ->
     )
     assert type(ds) == DataArray
     assert len(ds.data) == 2
+
+
+async def test_client_watch_stop_no_data() -> None:
+    hudson_client.watch()
+    hudson_client.stop()
+
+
+@mock.patch(
+    "hudson.client.Client.request",
+    side_effect=[
+        MockResponse(status_code=200, json=MockNamespace),
+        MockResponse(status_code=200, json=MockDataset),
+        MockResponse(status_code=200),
+        MockResponse(status_code=200),
+        MockResponse(status_code=200, json=MockDataArray),
+    ],
+)
+async def test_client_watch_stop_with_data(
+    mock_request: mock.MagicMock,
+) -> None:
+    import torch
+
+    ns = hudson_client.create_namespace(
+        name="default",
+    )
+    ds = hudson_client.create_dataset(
+        namespace_id=UUID(str(MockNamespace["id"])),
+        name="default",
+    )
+    hudson_client.watch()
+    n = hudson_client.min_batch_upload_size
+    b = 2
+    str_len = 10
+
+    for batch in range(b):
+        with open(f"{hudson_client.client_watch_dir}/data-{batch}.jsonl", "w") as f:
+            for i in range(n):
+                doc = Document(
+                    text="".join(
+                        random.choices(
+                            string.ascii_uppercase + string.digits,
+                            k=str_len,
+                        )
+                    ),
+                    embedding=torch.randn(768),
+                )
+                f.write(doc.to_json() + "\n")
+
+    hudson_client.stop()
+
+    da = hudson_client.read_dataset(
+        namespace_id=ns.id,
+        dataset_id=ds.id,
+    )
+    assert isinstance(da, DocumentArray)
+    assert len(da) == 2
+
+
+@mock.patch(
+    "hudson.client.Client.request",
+    side_effect=[
+        MockResponse(status_code=200, json=MockNamespace),
+        MockResponse(status_code=200, json=MockDataset),
+        MockResponse(status_code=200, json=MockDataArray),
+    ],
+)
+async def test_case_and_upload_noop(
+    mock_request: mock.MagicMock,
+) -> None:
+    import torch
+
+    ns = hudson_client.create_namespace(
+        name="default",
+    )
+    ds = hudson_client.create_dataset(
+        namespace_id=UUID(str(MockNamespace["id"])),
+        name="default",
+    )
+    hudson_client.watch()
+    n = hudson_client.min_batch_upload_size - 1
+    b = 1
+    str_len = 10
+
+    for batch in range(b):
+        with open(f"{hudson_client.client_watch_dir}/data-{batch}.jsonl", "w") as f:
+            for i in range(n):
+                doc = Document(
+                    text="".join(
+                        random.choices(
+                            string.ascii_uppercase + string.digits,
+                            k=str_len,
+                        )
+                    ),
+                    embedding=torch.randn(768),
+                )
+                f.write(doc.to_json() + "\n")
+
+    hudson_client.stop()
+
+    da = hudson_client.read_dataset(
+        namespace_id=ns.id,
+        dataset_id=ds.id,
+    )
+    assert isinstance(da, DocumentArray)
+    assert len(da) == 2

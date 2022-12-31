@@ -1,14 +1,15 @@
 import json
 import os
+import sys
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Optional
 
-from pydantic import UUID4, AnyUrl, BaseModel, DirectoryPath, Field, FilePath, StrictInt
+from pydantic import UUID4, AnyUrl, BaseModel, Field, StrictInt, StrictStr
 
 
 class HudsonClientConfig(BaseModel):
-    config_path: FilePath = Field(
-        default=Path(f"{os.environ['HOME']}/.hudson/config.json"),
+    config_path: StrictStr = Field(
+        default=f"{os.environ['HOME']}/.hudson/config.json",
         description="The path to the config file",
     )
     namespace_id: Optional[UUID4] = Field(
@@ -29,32 +30,39 @@ class HudsonClientConfig(BaseModel):
         default=60,
         description="Max seconds the client will wait for the server",
     )
-    client_watch_dir: DirectoryPath = Field(
-        default=Path(f"{os.environ['PWD']}/.hudson/watch"),
+    client_watch_dir: StrictStr = Field(
+        default=f"{os.environ['PWD']}/.hudson/watch",
         description="The directory to watch for data.",
     )
 
     def init(self) -> None:
-        if self.config_path.exists():
+        if Path(self.config_path).exists():
             self.load()
         else:
             self.save()
 
-    def load(self) -> None:
-        self.__dict__.update(self.load_config())
+    def load(self) -> Dict:
+        return self._load_config()
 
     def save(self) -> None:
-        self.save_config()
+        self._save_config()
 
-    def load_config(self) -> dict:
-        with open(str(self.config_path), "r") as f:
+    def _load_config(self) -> Dict:
+        with open(self.config_path, "r") as f:
             return json.load(f)
 
-    def save_config(self) -> None:
+    def _save_config(self) -> None:
         data = json.loads(self.json())
-        with open(str(self.config_path), "w") as f:
+        with open(self.config_path, "w") as f:
             json.dump(data, f)
 
 
 config = HudsonClientConfig()
+
+if "pytest" in "".join(sys.argv):
+    config = HudsonClientConfig(
+        config_path=f"{os.environ['HOME']}/.hudson/config.json.test",
+        client_watch_dir=f"{os.environ['PWD']}/.hudson/watch.test",
+    )
+
 config.init()
