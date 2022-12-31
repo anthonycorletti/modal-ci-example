@@ -6,20 +6,21 @@ from pydantic import BaseSettings, Field
 
 
 class _Env(BaseSettings):
-    LOG_LEVEL: str = Field(
-        "INFO",
-        env="LOG_LEVEL",
-        description="Log level.",
-    )
-    HUDSON_SERVER_URL: str = Field(
-        "http://localhost:8000",
-        env="HUDSON_SERVER_URL",
-        description="The Hudson server URL.",
-    )
+    #
+    #   Required
+    #
     API_SECRET_KEY: str = Field(
         ...,
         env="API_SECRET_KEY",
         description="The API secret key.",
+    )
+    #
+    #   Optional
+    #
+    LOG_LEVEL: str = Field(
+        "INFO",
+        env="LOG_LEVEL",
+        description="Log level.",
     )
     PSQL_URL: str = Field(
         "postgresql+asyncpg://hudson:hudson@localhost:5432/hudson",
@@ -46,11 +47,6 @@ class _Env(BaseSettings):
         env="DATASETS_PATH",
         description="The root dir for storing datasets.",
     )
-    TIMEOUT_SECONDS: int = Field(
-        60,
-        env="TIMEOUT_SECONDS",
-        description="The timeout for HTTP requests.",
-    )
     MODAL_VOLUME_NAME: str = Field(
         "hudson-datasets",
         env="MODAL_VOLUME_NAME",
@@ -67,7 +63,7 @@ class _Env(BaseSettings):
         return _result
 
     class Config:
-        env_file = ".env", ".env.local"
+        env_file = ".env.local"
         env_encoding = "utf-8"
 
 

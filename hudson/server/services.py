@@ -14,7 +14,6 @@ from pydantic import UUID4
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from hudson._env import env
 from hudson._types import DataArray, Message
 from hudson.models import (
     Dataset,
@@ -26,6 +25,7 @@ from hudson.models import (
     Topic,
     TopicCreate,
 )
+from hudson.settings import env
 
 
 class NamespaceService:

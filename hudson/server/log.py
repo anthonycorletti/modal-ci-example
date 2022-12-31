@@ -8,7 +8,7 @@ from queue import SimpleQueue
 from typing import Any, List
 from uuid import UUID
 
-from hudson._env import env
+from hudson.settings import env
 
 
 class LogEncoder(json.JSONEncoder):

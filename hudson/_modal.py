@@ -1,8 +1,8 @@
 import modal
 from fastapi import FastAPI
 
-from hudson._env import _Env
 from hudson.server.main import app
+from hudson.settings import _Env
 
 stub = modal.Stub()
 

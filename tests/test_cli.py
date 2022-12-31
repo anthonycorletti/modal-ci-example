@@ -3,7 +3,7 @@ from multiprocessing import Process
 from typer.testing import CliRunner
 
 from hudson import __version__
-from hudson.cli.main import app
+from hudson.cli import app
 
 
 def test_cli_version(runner: CliRunner) -> None:

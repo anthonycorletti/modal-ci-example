@@ -1,4 +1,4 @@
-from hudson._env import _Env
+from hudson.settings import _Env
 
 
 def test_env_conversion() -> None:
