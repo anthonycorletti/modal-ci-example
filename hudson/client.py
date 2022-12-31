@@ -119,6 +119,7 @@ class HudsonClient:
         dataset_id: UUID4,
         as_document_array: bool = True,
     ) -> Union[DocumentArray, DataArray]:
+        # TODO: opti: this read is far slower than it should be
         response = self.request(
             method="GET",
             path=f"/namespaces/{namespace_id}/datasets/{dataset_id}/read",

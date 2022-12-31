@@ -31,6 +31,7 @@ edit_uri: ""
 nav:
   - Welcome: index.md
   - Quickstart: quickstart.md
+  - Hudson Watch: hudson-watch.md
   - Examples:
       - Text: examples/text.md
       - Tabular: examples/tabular.md
