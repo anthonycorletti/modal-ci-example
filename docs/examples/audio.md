@@ -9,6 +9,6 @@ Use Hudson to log the data in an audio workflow.
 ## Run a full example with `hudson.watch`
 
 ```Python
-# TODO: coming soon!
+# TODO: example coming soon!
 {!../docs_src/examples/audio_watch.py!}
 ```
