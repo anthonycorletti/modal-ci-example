@@ -40,7 +40,7 @@ Some features of Hudson are;
 
 ## What's Hudson?
 
-Hudson is a framework for building services on Modal. Hudson is great for building data applications with messaging/ pub-sub workflows.
+Hudson is a framework for building web applications on Modal. Hudson is great for building APIs, data applications, MVC applications, and messaging/ pub-sub workflows.
 
 Hudson runs as a server-side application and provides a REST API for your application to communicate with. Hudson also provides a python client library that you can use to interact with the server.
 

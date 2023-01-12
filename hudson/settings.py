@@ -42,15 +42,12 @@ class _Env(BaseSettings):
         env="PSQL_POOL_PRE_PING",
         description="The PSQL database pre pool ping.",
     )
-    DATASETS_PATH: str = Field(
-        f"{os.environ['HOME']}/.hudson/datasets",
-        env="DATASETS_PATH",
-        description="The root dir for storing datasets.",
-    )
-    MODAL_VOLUME_NAME: str = Field(
-        "hudson-datasets",
-        env="MODAL_VOLUME_NAME",
-        description="The Modal volume name for datasets.",
+    VOLUMES: Dict[str, str] = Field(
+        dict(),
+        env="VOLUMES",
+        description="Remote volumes specifications; formatted as "
+        "{volume_name: volume_mount_location} where volume_mount_location is an "
+        "absolute path.",
     )
 
     def to_modal_secret(self) -> Dict[str, str]:

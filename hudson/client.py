@@ -63,7 +63,6 @@ class HudsonClient:
             path=f"/namespaces/{namespace_id}",
         )
         config.namespace_id = None
-        config.dataset_id = None
         config.save()
         return NamespaceRead(**response)
 

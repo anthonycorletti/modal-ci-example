@@ -15,9 +15,6 @@ class HudsonClientConfig(BaseModel):
     namespace_id: Optional[UUID4] = Field(
         description="The namespace ID",
     )
-    dataset_id: Optional[UUID4] = Field(
-        description="The dataset ID",
-    )
     server_url: StrictStr = Field(
         default="http://localhost:8000",
         description="The hudson server URL",
@@ -29,10 +26,6 @@ class HudsonClientConfig(BaseModel):
     timeout_seconds: StrictInt = Field(
         default=300,
         description="Max seconds the client will wait for the server",
-    )
-    client_watch_dir: StrictStr = Field(
-        default=f"{os.environ['PWD']}/.hudson/watch",
-        description="The directory to watch for data.",
     )
 
     def init(self) -> None:
@@ -64,7 +57,6 @@ config = HudsonClientConfig()
 if "pytest" in "".join(sys.argv):
     config = HudsonClientConfig(
         config_path=f"{os.environ['HOME']}/.hudson/config.json.test",
-        client_watch_dir=f"{os.environ['PWD']}/.hudson/watch.test",
     )
 
 config.init()

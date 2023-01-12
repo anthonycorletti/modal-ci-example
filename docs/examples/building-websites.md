@@ -51,8 +51,6 @@ http://localhost:8000/namespaces/{ns.id}/topics \
 -d '{ "name": "my-topic" }'
 ```
 
-
-
 ### Making subscriptions
 
 A subscription is a place where messages are received from a topic. These subscribers then take the message and can do anything with it.

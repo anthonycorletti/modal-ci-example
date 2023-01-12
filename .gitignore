@@ -149,5 +149,4 @@ tmp/
 .ruff_cache/
 
 # hudson
-hudson_test_datasets
 .hudson/

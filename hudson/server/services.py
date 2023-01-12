@@ -1,7 +1,5 @@
 import asyncio
 import base64
-import shutil
-from pathlib import Path
 from typing import List, Optional
 
 import httpx
@@ -18,7 +16,6 @@ from hudson.models import (
     Topic,
     TopicCreate,
 )
-from hudson.settings import env
 
 
 class NamespaceService:
@@ -88,10 +85,6 @@ class NamespaceService:
         if namespace:
             await psql.delete(namespace)
             await psql.commit()
-
-        namespace_dir = Path(env.DATASETS_PATH) / str(namespace.id)
-        if namespace_dir.exists():
-            shutil.rmtree(namespace_dir)
 
         return namespace
 

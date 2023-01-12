@@ -1,7 +1,9 @@
 from datetime import datetime
 from typing import List, Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, Request, Response
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from pydantic import UUID4
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -26,10 +28,19 @@ from hudson.server.services import (
     topics_service,
 )
 from hudson.server.utils import _APIRoute
+from hudson.settings import env
 
+home_router = APIRouter(route_class=_APIRoute, tags=["home"])
 health_router = APIRouter(route_class=_APIRoute, tags=["health"])
 namespace_router = APIRouter(route_class=_APIRoute, tags=["namespace"])
 pubsub_router = APIRouter(route_class=_APIRoute, tags=["pubsub"])
+templates = Jinja2Templates(directory="templates")
+
+
+@home_router.get("/", response_class=HTMLResponse)
+async def _index(request: Request) -> Response:
+    log.info(f"whoa! the secret is {env.API_SECRET_KEY}")
+    return templates.TemplateResponse(name="index.html", context={"request": request})
 
 
 @health_router.get("/healthcheck", response_model=HealthResponse)

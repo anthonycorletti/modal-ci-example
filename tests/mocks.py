@@ -1,8 +1,6 @@
 from typing import Any, Optional
 from uuid import uuid4
 
-from hudson._types import DataArray
-
 
 class MockResponse:
     def __init__(
@@ -27,18 +25,4 @@ MockNamespace = {
     "created_at": "2021-01-01T00:00:00+00:00",
     "updated_at": "2021-01-01T00:00:00+00:00",
     "topics": [],
-    "datasets": [],
 }
-
-
-MockDataset = {
-    "id": uuid4(),
-    "name": "default",
-    "namespace_id": uuid4(),
-    "created_at": "2021-01-01T00:00:00+00:00",
-    "updated_at": "2021-01-01T00:00:00+00:00",
-    "namespace": MockNamespace,
-}
-
-
-MockDataArray = DataArray.Config.schema_extra["example"]

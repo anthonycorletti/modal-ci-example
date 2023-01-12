@@ -1,5 +1,5 @@
 site_name: Hudson
-site_description: Run stuff on Modal.
+site_description: Build stuff on Modal.
 site_url: https://hudson.corletti.xyz
 
 theme:
@@ -32,9 +32,12 @@ nav:
   - Welcome: index.md
   - Concepts: concepts.md
   - Quickstart: quickstart.md
-  - Testing and Continuous Integration: ci.md
-  - Building Workflows: building-workflows.md
+  - Testing and Continuous Integration: examples/ci.md
   - Deploy to Modal: deploy-to-modal.md
+  - Examples:
+      - Building Workflows: examples/building-workflows.md
+      - Building Websites: examples/building-websites.md
+      - Prompt Curation: examples/prompt-curation.md
   - Development & Contributing: contributing.md
   - Release Notes: release-notes.md
 

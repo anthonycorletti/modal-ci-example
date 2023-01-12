@@ -1,8 +1,8 @@
 """init
 
-Revision ID: d4c6ea8f7596
+Revision ID: 51252bb18e1f
 Revises:
-Create Date: 2022-12-30 03:50:21.597857+00:00
+Create Date: 2023-01-12 04:05:45.046234+00:00
 
 """
 from alembic import op
@@ -11,7 +11,7 @@ import sqlmodel  # noqa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "d4c6ea8f7596"
+revision = "51252bb18e1f"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,24 +29,6 @@ def upgrade() -> None:
         sa.UniqueConstraint("name"),
     )
     op.create_index(op.f("ix_namespaces_id"), "namespaces", ["id"], unique=False)
-    op.create_table(
-        "datasets",
-        sa.Column("created_at", sa.DateTime(), nullable=False),
-        sa.Column("updated_at", sa.DateTime(), nullable=False),
-        sa.Column("namespace_id", postgresql.UUID(as_uuid=True), nullable=False),
-        sa.Column("id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
-        sa.Column("name", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-        sa.Column("description", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["namespace_id"], ["namespaces.id"], ondelete="CASCADE"
-        ),
-        sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("namespace_id", "name"),
-    )
-    op.create_index(op.f("ix_datasets_id"), "datasets", ["id"], unique=False)
-    op.create_index(
-        op.f("ix_datasets_namespace_id"), "datasets", ["namespace_id"], unique=False
-    )
     op.create_table(
         "topics",
         sa.Column("created_at", sa.DateTime(), nullable=False),
@@ -92,9 +74,6 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_topics_namespace_id"), table_name="topics")
     op.drop_index(op.f("ix_topics_id"), table_name="topics")
     op.drop_table("topics")
-    op.drop_index(op.f("ix_datasets_namespace_id"), table_name="datasets")
-    op.drop_index(op.f("ix_datasets_id"), table_name="datasets")
-    op.drop_table("datasets")
     op.drop_index(op.f("ix_namespaces_id"), table_name="namespaces")
     op.drop_table("namespaces")
     # ### end Alembic commands ###
