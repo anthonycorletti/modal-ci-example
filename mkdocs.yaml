@@ -1,5 +1,5 @@
 site_name: Hudson
-site_description: Build multi-modal data applications with ease.
+site_description: Run stuff on Modal.
 site_url: https://hudson.corletti.xyz
 
 theme:
@@ -30,14 +30,9 @@ edit_uri: ""
 
 nav:
   - Welcome: index.md
+  - Concepts: concepts.md
   - Quickstart: quickstart.md
-  - Hudson Watch: hudson-watch.md
-  - Examples:
-      - Text: examples/text.md
-      - Tabular: examples/tabular.md
-      - Images: examples/images.md
-      - Audio: examples/audio.md
-      - Video: examples/video.md
+  - Testing and Continuous Integration: ci.md
   - Building Workflows: building-workflows.md
   - Deploy to Modal: deploy-to-modal.md
   - Development & Contributing: contributing.md

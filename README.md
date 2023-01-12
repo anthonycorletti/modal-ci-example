@@ -42,7 +42,7 @@ Some major features of Hudson are;
 
 ## What's Hudson?
 
-Hudson is a framework for building multi-modal data applications.
+Hudson is a framework for building multi-modal data analytics applications.
 
 Hudson runs as a server-side application and provides a REST API for your application to communicate with. Hudson also provides a python client library that you can use to interact with the server.
 
@@ -50,7 +50,7 @@ Hudson runs as a server-side application and provides a REST API for your applic
 
 1. **Multi-modal data analytics**: One way to work with data across any modality.
 1. **Processing data in the cloud**: Build data processing pipelines with ease – no need to worry about infrastructure, plugging different cloud tools together, or writing code to support each modality.
-1. **Machine learning data analytics**: Send data from your machine learning workflow to Hudson for processing and analysis. It already works with any modality and framework – you just have to send in the data and embeddings and that's it!
+1. **Machine learning data analytics**: Send data from your machine learning workflow to Hudson for processing and analysis. It already works with any modality and framework – you just have to send in the data and that's it! Hudson uses off-the-shelf models to generate embeddings for your data so you never have to worry about training a model!
 
 ## Installing Hudson
 

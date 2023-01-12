@@ -2,7 +2,7 @@
   <b><a href="https://hudson.corletti.xyz"><img src="https://github.com/anthonycorletti/hudson/blob/main/docs/img/hudson.png?raw=true" alt="Hudson"></a></b>
 </p>
 <p align="center">
-    <em>🎶If you havin' data problems I feel bad for you son.<br>I got 99 problems and a framework ain't one.🎶</em>
+    <em>🎶If you havin' cloud problems I feel bad for you son.<br>I got 99 problems and a container ain't one.🎶</em>
 </p>
 <p align="center">
     <a href="https://github.com/anthonycorletti/hudson/actions?query=workflow%3Atest" target="_blank">
@@ -29,28 +29,20 @@ _:warning: Hudson is still in alpha and shouldn't be used in production yet. If 
 
 ---
 
-Build multi-modal data applications with ease.
+Build apps on Modal.
 
-Some major features of Hudson are;
+Some features of Hudson are;
 
 * 🐍 **Async Python**: Hudson is 100% async. It's built on top of [FastAPI](https://fastapi.tiangolo.com/), [SQLModel](https://sqlmodel.tiangolo.com/), [Uvicorn](https://www.uvicorn.org/), [Pydantic](https://docs.pydantic.dev), [DocArray](https://docarray.jina.ai/), and more.
-* 🧱 **DocArray**: Hudson uses [DocArray](https://docarray.jina.ai/) so you can work with multi-modal data without having to do work to support each modality separately.
-* 🐻‍❄️ **Polars**: Hudson uses [Polars](https://pola-rs.github.io/polars-book/) for blazing fast server-side data processing.
-* ☁️ **Modal**: Hudson deploys on [Modal](https://modal.com) by default. No need to worry about infrastructure, Kubernetes, or containers!
+* ☁️ **Modal**: Hudson uses [Modal](https://modal.com) for CI and deploys on [Modal](https://modal.com) by default. No need to worry about infrastructure, Kubernetes, or containers!
 * 📨 **Publish-subscribe** functionality built right in. Create any workflow you need with Hudson!
 * ✍️ **Just write code!** No YAML necessary.
 
 ## What's Hudson?
 
-Hudson is a framework for building multi-modal data applications.
+Hudson is a framework for building services on Modal. Hudson is great for building data applications with messaging/ pub-sub workflows.
 
 Hudson runs as a server-side application and provides a REST API for your application to communicate with. Hudson also provides a python client library that you can use to interact with the server.
-
-## Use cases
-
-1. **Multi-modal data analytics**: One way to work with data across any modality.
-1. **Processing data in the cloud**: Build data processing pipelines with ease – no need to worry about infrastructure, plugging different cloud tools together, or writing code to support each modality.
-1. **Machine learning data analytics**: Send data from your machine learning workflow to Hudson for processing and analysis. It already works with any modality and framework – you just have to send in the data and embeddings and that's it!
 
 ## Installing Hudson
 

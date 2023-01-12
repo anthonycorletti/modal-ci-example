@@ -27,7 +27,7 @@ class HudsonClientConfig(BaseModel):
         description="The minimum number of samples needed to upload data",
     )
     timeout_seconds: StrictInt = Field(
-        default=60,
+        default=300,
         description="Max seconds the client will wait for the server",
     )
     client_watch_dir: StrictStr = Field(

@@ -1,23 +1,16 @@
 import asyncio
 import base64
-import json
-import os
 import shutil
-import time
 from pathlib import Path
 from typing import List, Optional
 
-import aiofiles
 import httpx
-import polars as pl
 from pydantic import UUID4
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from hudson._types import DataArray, Message
+from hudson._types import Message
 from hudson.models import (
-    Dataset,
-    DatasetCreate,
     Namespace,
     NamespaceCreate,
     Subscription,
@@ -29,18 +22,28 @@ from hudson.settings import env
 
 
 class NamespaceService:
-    async def get_by_name(self, name: str, psql: AsyncSession) -> Optional[Namespace]:
+    async def get_by_name(
+        self,
+        name: str,
+        psql: AsyncSession,
+    ) -> Optional[Namespace]:
         results = await psql.execute(select(Namespace).where(Namespace.name == name))
         return results.scalars().first()
 
-    async def get(self, namespace_id: UUID4, psql: AsyncSession) -> Optional[Namespace]:
+    async def get(
+        self,
+        namespace_id: UUID4,
+        psql: AsyncSession,
+    ) -> Optional[Namespace]:
         results = await psql.execute(
             select(Namespace).where(Namespace.id == namespace_id)
         )
         return results.scalars().first()
 
     async def create(
-        self, namespace_create: NamespaceCreate, psql: AsyncSession
+        self,
+        namespace_create: NamespaceCreate,
+        psql: AsyncSession,
     ) -> Namespace:
         namespace = Namespace(name=namespace_create.name)
         psql.add(namespace)
@@ -48,7 +51,11 @@ class NamespaceService:
         await psql.refresh(namespace)
         return namespace
 
-    async def list(self, name: Optional[str], psql: AsyncSession) -> List[Namespace]:
+    async def list(
+        self,
+        name: Optional[str],
+        psql: AsyncSession,
+    ) -> List[Namespace]:
         if name is not None:
             results = (
                 (
@@ -69,7 +76,11 @@ class NamespaceService:
             )
         return results
 
-    async def delete(self, namespace_id: UUID4, psql: AsyncSession) -> Namespace:
+    async def delete(
+        self,
+        namespace_id: UUID4,
+        psql: AsyncSession,
+    ) -> Namespace:
         results = await psql.execute(
             select(Namespace).where(Namespace.id == namespace_id)
         )
@@ -87,7 +98,10 @@ class NamespaceService:
 
 class TopicsService:
     async def list(
-        self, namespace_id: UUID4, name: Optional[str], psql: AsyncSession
+        self,
+        namespace_id: UUID4,
+        name: Optional[str],
+        psql: AsyncSession,
     ) -> List[Topic]:
         if name is not None:
             results = (
@@ -119,7 +133,10 @@ class TopicsService:
         return results
 
     async def get(
-        self, topic_id: UUID4, namespace_id: UUID4, psql: AsyncSession
+        self,
+        topic_id: UUID4,
+        namespace_id: UUID4,
+        psql: AsyncSession,
     ) -> Optional[Topic]:
         results = await psql.execute(
             select(Topic).where(
@@ -129,7 +146,11 @@ class TopicsService:
         )
         return results.scalars().first()
 
-    async def create(self, topic_create: TopicCreate, psql: AsyncSession) -> Topic:
+    async def create(
+        self,
+        topic_create: TopicCreate,
+        psql: AsyncSession,
+    ) -> Topic:
         results = await psql.execute(
             select(Topic).where(
                 Topic.name == topic_create.name,
@@ -146,11 +167,15 @@ class TopicsService:
         return topic
 
     async def delete(
-        self, topic_id: UUID4, namespace_id: UUID4, psql: AsyncSession
+        self,
+        topic_id: UUID4,
+        namespace_id: UUID4,
+        psql: AsyncSession,
     ) -> Topic:
         results = await psql.execute(
             select(Topic).where(
-                Topic.id == topic_id, Topic.namespace_id == namespace_id
+                Topic.id == topic_id,
+                Topic.namespace_id == namespace_id,
             )
         )
         topic = results.scalars().first()
@@ -159,10 +184,14 @@ class TopicsService:
             await psql.commit()
         return topic
 
-    async def publish_message(self, topic: Topic, message: Message) -> None:
+    async def publish_message(
+        self,
+        topic: Topic,
+        message: Message,
+    ) -> None:
         # TODO: hudson supports http-push publishing to HTTPS endpoints.
         # hudson should support other modes and other protocols in the future
-        # e.g. pull, gRPC, carrier pigeon, etc.
+        # e.g. pull, gRPC, websocket, carrier pigeon, idk, etc.
         await asyncio.gather(
             *[
                 self.publish_message_to_subscription(
@@ -176,7 +205,9 @@ class TopicsService:
         )
 
     async def publish_message_to_subscription(
-        self, subscription: Subscription, message: str
+        self,
+        subscription: Subscription,
+        message: str,
     ) -> None:
         async with httpx.AsyncClient() as client:
             await client.post(
@@ -188,7 +219,9 @@ class TopicsService:
 
 class SubscriptionsService:
     async def create(
-        self, subscription_create: SubscriptionCreate, psql: AsyncSession
+        self,
+        subscription_create: SubscriptionCreate,
+        psql: AsyncSession,
     ) -> Subscription:
         results = await psql.execute(
             select(Subscription).where(
@@ -217,7 +250,10 @@ class SubscriptionsService:
                 (
                     await psql.execute(
                         select(Subscription)
-                        .join(Topic, Subscription.topic_id == Topic.id)
+                        .join(
+                            Topic,
+                            Subscription.topic_id == Topic.id,
+                        )
                         .where(
                             Topic.namespace_id == namespace_id,
                             Subscription.topic_id == topic_id,
@@ -234,7 +270,10 @@ class SubscriptionsService:
                 (
                     await psql.execute(
                         select(Subscription)
-                        .join(Topic, Subscription.topic_id == Topic.id)
+                        .join(
+                            Topic,
+                            Subscription.topic_id == Topic.id,
+                        )
                         .where(
                             Topic.namespace_id == namespace_id,
                             Subscription.topic_id == topic_id,
@@ -288,125 +327,6 @@ class SubscriptionsService:
         return subscription
 
 
-class DatasetsService:
-    async def create(
-        self, dataset_create: DatasetCreate, psql: AsyncSession
-    ) -> Dataset:
-        results = await psql.execute(
-            select(Dataset).where(
-                Dataset.name == dataset_create.name,
-                Dataset.namespace_id == dataset_create.namespace_id,
-            )
-        )
-        dataset = results.scalars().first()
-        if dataset is not None:
-            return dataset
-        dataset = Dataset(**dataset_create.dict())
-        psql.add(dataset)
-        await psql.commit()
-        await psql.refresh(dataset)
-        return dataset
-
-    async def create_directory_for_dataset(self, dataset: Dataset) -> None:
-        dataset_path = (
-            Path(env.DATASETS_PATH) / str(dataset.namespace_id) / str(dataset.id)
-        )
-        dataset_path.mkdir(parents=True, exist_ok=True)
-
-    async def list(
-        self,
-        namespace_id: UUID4,
-        name: Optional[str],
-        psql: AsyncSession,
-    ) -> List[Dataset]:
-        if name is not None:
-            results = (
-                (
-                    await psql.execute(
-                        select(Dataset)
-                        .where(
-                            Dataset.namespace_id == namespace_id,
-                            Dataset.name.contains(name),  # type: ignore
-                        )
-                        .order_by(Dataset.name)
-                    )
-                )
-                .scalars()
-                .all()
-            )
-        else:
-            results = (
-                (
-                    await psql.execute(
-                        select(Dataset)
-                        .where(Dataset.namespace_id == namespace_id)
-                        .order_by(Dataset.name)
-                    )
-                )
-                .scalars()
-                .all()
-            )
-        return results
-
-    async def get(
-        self, dataset_id: UUID4, namespace_id: UUID4, psql: AsyncSession
-    ) -> Optional[Dataset]:
-        results = await psql.execute(
-            select(Dataset).where(
-                Dataset.id == dataset_id,
-                Dataset.namespace_id == namespace_id,
-            )
-        )
-        return results.scalars().first()
-
-    async def delete(
-        self, dataset_id: UUID4, namespace_id: UUID4, psql: AsyncSession
-    ) -> Dataset:
-        results = await psql.execute(
-            select(Dataset).where(
-                Dataset.id == dataset_id, Dataset.namespace_id == namespace_id
-            )
-        )
-        dataset = results.scalars().first()
-        if dataset:
-            await psql.delete(dataset)
-            await psql.commit()
-
-        dataset_path = Path(env.DATASETS_PATH) / str(namespace_id) / str(dataset_id)
-        if dataset_path.exists():
-            shutil.rmtree(dataset_path)
-
-        return dataset
-
-    async def write(
-        self, namespace_id: UUID4, dataset_id: UUID4, data_array: DataArray
-    ) -> None:
-        dataset_path = (
-            Path(env.DATASETS_PATH)
-            / str(namespace_id)
-            / str(dataset_id)
-            / f"{int(time.time() * 1000)}.jsonl"
-        )
-        async with aiofiles.open(dataset_path, "w") as f:
-            for d in data_array.data:
-                await f.write(json.dumps(d.dict()))
-        df = pl.read_ndjson(dataset_path)
-        df.write_ipc(dataset_path.with_suffix(".arrow"))
-        os.remove(dataset_path)
-
-    async def read(
-        self,
-        namespace_id: UUID4,
-        dataset_id: UUID4,
-    ) -> DataArray:
-        dataset_path = (
-            Path(env.DATASETS_PATH) / str(namespace_id) / str(dataset_id) / "*.arrow"
-        )
-        df = pl.read_ipc(dataset_path)
-        return DataArray(data=df.to_dicts())
-
-
 namespace_service = NamespaceService()
 topics_service = TopicsService()
 subscriptions_service = SubscriptionsService()
-datasets_service = DatasetsService()
