@@ -30,6 +30,6 @@ alembic upgrade head
 hudson server
 ```
 
-## ... 🤔
+## Visit the homepage
 
-More coming soon!
+Visit [http://localhost:8000/](http://localhost:8000/) in your browser.

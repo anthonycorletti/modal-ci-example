@@ -29,18 +29,18 @@ _:warning: Hudson is still in alpha and shouldn't be used in production yet. If 
 
 ---
 
-Build apps on Modal.
+Modal-native web framework for data apps, APIs, and more.
 
 Some features of Hudson are;
 
-* 🐍 **Async Python**: Hudson is 100% async. It's built on top of [FastAPI](https://fastapi.tiangolo.com/), [SQLModel](https://sqlmodel.tiangolo.com/), [Uvicorn](https://www.uvicorn.org/), [Pydantic](https://docs.pydantic.dev), [DocArray](https://docarray.jina.ai/), and more.
+* 🐍 **Async Python**: Hudson is 100% async. It's built on top of [FastAPI](https://fastapi.tiangolo.com/), [SQLModel](https://sqlmodel.tiangolo.com/), [Uvicorn](https://www.uvicorn.org/), and [Pydantic](https://docs.pydantic.dev).
 * ☁️ **Modal**: Hudson uses [Modal](https://modal.com) for CI and deploys on [Modal](https://modal.com) by default. No need to worry about infrastructure, Kubernetes, or containers!
 * 📨 **Publish-subscribe** functionality built right in. Create any workflow you need with Hudson!
 * ✍️ **Just write code!** No YAML necessary.
 
 ## What's Hudson?
 
-Hudson is a framework for building web applications on Modal. Hudson is great for building APIs, data applications, MVC applications, and messaging/ pub-sub workflows.
+Hudson is a framework for building web applications on Modal. Hudson is great for building APIs, data applications, MVC style apps, and messaging/ pub-sub workflows.
 
 Hudson runs as a server-side application and provides a REST API for your application to communicate with. Hudson also provides a python client library that you can use to interact with the server.
 

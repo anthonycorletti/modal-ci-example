@@ -1,5 +1,5 @@
 site_name: Hudson
-site_description: Build stuff on Modal.
+site_description: Modal-native web framework for data apps, APIs, and more.
 site_url: https://hudson.corletti.xyz
 
 theme:
@@ -32,12 +32,13 @@ nav:
   - Welcome: index.md
   - Concepts: concepts.md
   - Quickstart: quickstart.md
-  - Testing and Continuous Integration: examples/ci.md
+  - Testing and Continuous Integration: testing.md
   - Deploy to Modal: deploy-to-modal.md
   - Examples:
-      - Building Workflows: examples/building-workflows.md
-      - Building Websites: examples/building-websites.md
-      - Prompt Curation: examples/prompt-curation.md
+      - Build Workflows: examples/building-workflows.md
+      - Build Fullstack Web Apps: examples/building-fullstack-web-apps.md
+      - Build Prompt Curation API: examples/prompt-curation.md
+      - Build Stable Diffusion API: examples/stable-diffusion.md
   - Development & Contributing: contributing.md
   - Release Notes: release-notes.md
 

@@ -1,6 +1,7 @@
 from unittest import mock
 from uuid import UUID
 
+import pytest
 
 from hudson import hudson_client
 from hudson.exc import BaseHudsonException
@@ -45,3 +46,12 @@ async def test_delete_namespace(mock_request: mock.MagicMock) -> None:
 async def test_list_namespaces(mock_request: mock.MagicMock) -> None:
     ns = hudson_client.list_namespaces("default")
     assert ns[0].name == "default"
+
+
+@mock.patch(
+    "hudson.client.Client.request",
+    return_value=MockResponse(status_code=500, text="Internal Server Error"),
+)
+async def test_client_returns_error(mock_request: mock.MagicMock) -> None:
+    with pytest.raises(BaseHudsonException):
+        hudson_client.list_namespaces("default")

@@ -29,7 +29,9 @@ class StructuredMessage:
         self.kwargs = kwargs
 
     def __str__(self) -> str:
-        return LogEncoder().encode(self.kwargs)
+        # drop the raw message data, as it's already been logged
+        self.kwargs.pop("message", None)
+        return LogEncoder(ensure_ascii=False).encode(self.kwargs)
 
 
 class OnelineFormatter(logging.Formatter):
@@ -53,7 +55,9 @@ class StructuredLogger:
     def create_logger() -> logging.Logger:
         logger = logging.getLogger(__name__)
         log_handler = logging.StreamHandler()
-        formatter = OnelineFormatter(datefmt=StructuredLogger.DATE_FORMAT)
+        formatter = OnelineFormatter(
+            datefmt=StructuredLogger.DATE_FORMAT,
+        )
         log_handler.setFormatter(formatter)
         logger.addHandler(log_handler)
         logger.setLevel(env.LOG_LEVEL.upper())
@@ -91,7 +95,9 @@ def setup_logging_queue() -> None:
             handlers.append(h)
 
     listener = logging.handlers.QueueListener(
-        queue, *handlers, respect_handler_level=True
+        queue,
+        *handlers,
+        respect_handler_level=True,
     )
     listener.start()
 

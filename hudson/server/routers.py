@@ -28,7 +28,6 @@ from hudson.server.services import (
     topics_service,
 )
 from hudson.server.utils import _APIRoute
-from hudson.settings import env
 
 home_router = APIRouter(route_class=_APIRoute, tags=["home"])
 health_router = APIRouter(route_class=_APIRoute, tags=["health"])
@@ -39,7 +38,6 @@ templates = Jinja2Templates(directory="templates")
 
 @home_router.get("/", response_class=HTMLResponse)
 async def _index(request: Request) -> Response:
-    log.info(f"whoa! the secret is {env.API_SECRET_KEY}")
     return templates.TemplateResponse(name="index.html", context={"request": request})
 
 
@@ -50,7 +48,7 @@ async def get_health() -> HealthResponse:
     Returns:
         HealthResponse: The health of the server.
     """
-    log.info("Healthcheck")
+    log.info("Healthcheck!")
     return HealthResponse(message="⛵️", version=__version__, time=datetime.utcnow())
 
 

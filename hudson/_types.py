@@ -41,8 +41,11 @@ class RequestLoggerMessage(BaseModel):
 
 class ResponseLoggerMessage(BaseModel):
     status_code: StrictInt
-    body: Json
     raw_headers: List
+
+
+class JsonResponseLoggerMessage(BaseModel):
+    body: Json
 
 
 class Message(BaseModel):
