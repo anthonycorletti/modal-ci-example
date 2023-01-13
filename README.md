@@ -1,5 +1,5 @@
 <p align="center">
-  <b><a href="https://hudson.corletti.xyz"><img src="https://github.com/anthonycorletti/hudson/blob/main/docs/img/hudson.png?raw=true" alt="Hudson"></a></b>
+  <b><a href="https://hudson.corletti.xyz"><img src="https://github.com/anthonycorletti/hudson/blob/main/docs/img/hudson-logo.png?raw=true" alt="Hudson"></a></b>
 </p>
 <p align="center">
     <em>🎶If you havin' cloud problems I feel bad for you son.<br>I got 99 problems and a container ain't one.🎶</em>
