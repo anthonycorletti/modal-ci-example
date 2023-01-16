@@ -26,15 +26,15 @@ def _modalinclude(path: str) -> bool:
     image=image,
     mounts=[
         modal.Mount(
-            local_dir=f"{os.environ['HOME']}/modalci/modalci",
+            local_dir=f"{os.environ['HOME']}/modal-ci-example/modalci",
             remote_dir="/root/modalci",
         ),
         modal.Mount(
-            local_dir=f"{os.environ['HOME']}/modalci/tests",
+            local_dir=f"{os.environ['HOME']}/modal-ci-example/tests",
             remote_dir="/root/tests",
         ),
         modal.Mount(
-            local_dir=f"{os.environ['HOME']}/modalci/",
+            local_dir=f"{os.environ['HOME']}/modal-ci-example/",
             remote_dir="/root",
             condition=_modalinclude,
         ),
