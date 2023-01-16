@@ -2,7 +2,7 @@ import json
 
 
 async def test_load_config() -> None:
-    from hudson.config import config
+    from modalci.config import config
 
     config.init()
     c = config.load()
@@ -10,7 +10,7 @@ async def test_load_config() -> None:
 
 
 async def test_load_config_update() -> None:
-    from hudson.config import config
+    from modalci.config import config
 
     with open(config.config_path, "w") as f:
         json.dump({"server_url": "http://localhost:8002"}, f)

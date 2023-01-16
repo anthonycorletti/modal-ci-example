@@ -1,10 +1,10 @@
 import typer
 import uvicorn
 
-from hudson import __version__
-from hudson.const import APP_IMPORT_STRING, HUDSON
+from modalci import __version__
+from modalci.const import APP_IMPORT_STRING, modalci
 
-name = f"{HUDSON} {__version__}"
+name = f"{modalci} {__version__}"
 
 app = typer.Typer(
     name=name,
@@ -23,7 +23,7 @@ main_callback.__doc__ = name
 
 @app.command("version")
 def _version() -> None:
-    """Print the version of Hudson."""
+    """Print the version of modalci."""
     typer.echo(__version__, nl=False)
 
 
@@ -49,7 +49,7 @@ def _server(
         help="Number of workers to run.",
     ),
 ) -> None:
-    """Start the Hudson server."""
+    """Start the modalci server."""
     uvicorn.run(  # pragma: no cover
         app=APP_IMPORT_STRING,
         port=port,
@@ -70,14 +70,14 @@ def _test() -> None:
 def _deploy(
     name: str = typer.Argument(..., help="Name of the project to deploy."),
     stub_filepath: str = typer.Option(
-        "hudson._modal_deploy",
+        "modalci._modal_deploy",
         "--stub-path",
         "-s",
         help="Filepath reference to the stub to deploy. "
         "Relative the project module root.",
     ),
 ) -> None:  # pragma: no cover
-    """Deploy Hudson to Modal."""
+    """Deploy modalci to Modal."""
     from modal.cli.app import deploy
 
     deploy(

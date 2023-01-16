@@ -57,13 +57,13 @@ Make sure postgres is running. We have a script that runs a postgres docker cont
 ./scripts/run-postgres.sh
 ```
 
-Then run the tests. The tests should automatically run migrations for the app.
+Then run the tests. The tests should automatically run migrations for the modalci.
 
 ```sh
 ./scripts/test.sh
 ```
 
-## Running hudson
+## Running the app
 
 Start postgres if you haven't done so already.
 
@@ -77,13 +77,13 @@ Run migrations
 ./scripts/alembic-upgrade-head.sh
 ```
 
-Start hudson
+Start the server
 
 ```sh
-hudson server --reload
+modalci server --reload
 ```
 
-Check that hudson is running
+Check that it's running
 
 ```
 $ curl -s "http://localhost:8000/healthcheck" | jq .message

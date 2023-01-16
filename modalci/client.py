@@ -4,12 +4,12 @@ from httpx import Client
 from httpx._types import HeaderTypes, QueryParamTypes, RequestContent, RequestData
 from pydantic import UUID4
 
-from hudson.config import config
-from hudson.exc import BaseHudsonException
-from hudson.models import NamespaceRead
+from modalci.config import config
+from modalci.exc import BasemodalciException
+from modalci.models import NamespaceRead
 
 
-class HudsonClient:
+class modalciClient:
     def __init__(self, url: str) -> None:
         self.url = url
         self._run_watch = True
@@ -37,7 +37,7 @@ class HudsonClient:
                 timeout=config.timeout_seconds,
             )
             if not response.is_success:
-                raise BaseHudsonException(response.text)
+                raise BasemodalciException(response.text)
             return response.json()
 
     def create_namespace(self, name: str) -> NamespaceRead:
@@ -75,4 +75,4 @@ class HudsonClient:
         return [NamespaceRead(**item) for item in response]
 
 
-hudson_client = HudsonClient(url=config.server_url)
+modalci_client = modalciClient(url=config.server_url)

@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any
 from uuid import uuid4
 
-from hudson.server.log import log
+from modalci.server.log import log
 
 
 def test_logger(capsys: Any) -> None:

@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from hudson.settings import env
+from modalci.settings import env
 
 async_psql_engine = create_async_engine(
     url=env.PSQL_URL,

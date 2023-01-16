@@ -2,7 +2,7 @@ import os
 
 from httpx import AsyncClient
 
-from hudson import __version__
+from modalci import __version__
 
 
 async def test_tz() -> None:

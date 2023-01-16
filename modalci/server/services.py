@@ -7,8 +7,8 @@ from pydantic import UUID4
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from hudson._types import Message
-from hudson.models import (
+from modalci._types import Message
+from modalci.models import (
     Namespace,
     NamespaceCreate,
     Subscription,
@@ -182,8 +182,8 @@ class TopicsService:
         topic: Topic,
         message: Message,
     ) -> None:
-        # TODO: hudson supports http-push publishing to HTTPS endpoints.
-        # hudson should support other modes and other protocols in the future
+        # TODO: modalci supports http-push publishing to HTTPS endpoints.
+        # modalci should support other modes and other protocols in the future
         # e.g. pull, gRPC, websocket, carrier pigeon, idk, etc.
         await asyncio.gather(
             *[

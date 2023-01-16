@@ -8,7 +8,7 @@ from queue import SimpleQueue
 from typing import Any, List
 from uuid import UUID
 
-from hudson.settings import env
+from modalci.settings import env
 
 
 class LogEncoder(json.JSONEncoder):

@@ -148,5 +148,5 @@ tmp/
 
 .ruff_cache/
 
-# hudson
-.hudson/
+# modal-ci-example
+.modal-ci-example/

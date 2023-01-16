@@ -4,13 +4,13 @@ from httpx import AsyncClient
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from hudson.models import Subscription
+from modalci.models import Subscription
 
 
 async def test_create_subscription(
     client: AsyncClient, async_db_session: AsyncSession
 ) -> None:
-    response = await client.post("/namespaces", json={"name": "hudson"})
+    response = await client.post("/namespaces", json={"name": "modalci"})
     assert response.status_code == 200
     namespace = response.json()
     response = await client.post(
@@ -42,7 +42,7 @@ async def test_create_subscription(
 
 
 async def test_create_subscription_that_already_exists(client: AsyncClient) -> None:
-    response = await client.post("/namespaces", json={"name": "hudson"})
+    response = await client.post("/namespaces", json={"name": "modalci"})
     assert response.status_code == 200
     namespace = response.json()
     response = await client.post(
@@ -80,7 +80,7 @@ async def test_create_subscription_that_already_exists(client: AsyncClient) -> N
 
 
 async def test_get_subscriptions(client: AsyncClient) -> None:
-    response = await client.post("/namespaces", json={"name": "hudson"})
+    response = await client.post("/namespaces", json={"name": "modalci"})
     assert response.status_code == 200
     namespace = response.json()
     response = await client.post(
@@ -121,7 +121,7 @@ async def test_get_subscriptions(client: AsyncClient) -> None:
 
 
 async def test_delete_subscription(client: AsyncClient) -> None:
-    response = await client.post("/namespaces", json={"name": "hudson"})
+    response = await client.post("/namespaces", json={"name": "modalci"})
     assert response.status_code == 200
     namespace = response.json()
     response = await client.post(
@@ -168,7 +168,7 @@ async def test_create_subscription_missing_namespace_fails(client: AsyncClient) 
 
 
 async def test_create_subscription_missing_topic_fails(client: AsyncClient) -> None:
-    response = await client.post("/namespaces", json={"name": "hudson"})
+    response = await client.post("/namespaces", json={"name": "modalci"})
     assert response.status_code == 200
     namespace = response.json()
     response = await client.post(
@@ -193,7 +193,7 @@ async def test_get_subscriptions_missing_namespace_fails(client: AsyncClient) ->
 
 
 async def test_get_subscriptions_missing_topic_fails(client: AsyncClient) -> None:
-    response = await client.post("/namespaces", json={"name": "hudson"})
+    response = await client.post("/namespaces", json={"name": "modalci"})
     assert response.status_code == 200
     namespace = response.json()
     response = await client.get(
@@ -212,7 +212,7 @@ async def test_delete_subscription_missing_namespace_fails(client: AsyncClient) 
 
 
 async def test_delete_subscription_missing_topic_fails(client: AsyncClient) -> None:
-    response = await client.post("/namespaces", json={"name": "hudson"})
+    response = await client.post("/namespaces", json={"name": "modalci"})
     assert response.status_code == 200
     namespace = response.json()
     response = await client.delete(
@@ -225,7 +225,7 @@ async def test_delete_subscription_missing_topic_fails(client: AsyncClient) -> N
 async def test_delete_subscription_missing_subscription_fails(
     client: AsyncClient,
 ) -> None:
-    response = await client.post("/namespaces", json={"name": "hudson"})
+    response = await client.post("/namespaces", json={"name": "modalci"})
     assert response.status_code == 200
     namespace = response.json()
     response = await client.post(
@@ -244,7 +244,7 @@ async def test_delete_subscription_missing_subscription_fails(
 async def test_delete_namespace_cascades_to_subscriptions(
     client: AsyncClient, async_db_session: AsyncSession
 ) -> None:
-    response = await client.post("/namespaces", json={"name": "hudson"})
+    response = await client.post("/namespaces", json={"name": "modalci"})
     assert response.status_code == 200
     namespace = response.json()
     response = await client.post(
@@ -278,7 +278,7 @@ async def test_delete_namespace_cascades_to_subscriptions(
 async def test_create_subscription_needs_https_endpoint(
     client: AsyncClient, async_db_session: AsyncSession
 ) -> None:
-    response = await client.post("/namespaces", json={"name": "hudson"})
+    response = await client.post("/namespaces", json={"name": "modalci"})
     assert response.status_code == 200
     namespace = response.json()
     response = await client.post(

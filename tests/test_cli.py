@@ -2,8 +2,8 @@ from multiprocessing import Process
 
 from typer.testing import CliRunner
 
-from hudson import __version__
-from hudson.cli import app
+from modalci import __version__
+from modalci.cli import app
 
 
 def test_cli_version(runner: CliRunner) -> None:

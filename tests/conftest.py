@@ -11,9 +11,9 @@ from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from typer.testing import CliRunner
 
-from hudson.config import config
-from hudson.db import async_psql_engine
-from hudson.server.main import app as server_app
+from modalci.config import config
+from modalci.db import async_psql_engine
+from modalci.server.main import app as server_app
 
 
 @pytest.fixture(scope="function")

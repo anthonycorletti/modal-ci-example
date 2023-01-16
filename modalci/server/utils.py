@@ -5,12 +5,12 @@ from uuid import uuid4
 from fastapi import Request, Response
 from fastapi.routing import APIRoute
 
-from hudson._types import (
+from modalci._types import (
     JsonResponseLoggerMessage,
     RequestLoggerMessage,
     ResponseLoggerMessage,
 )
-from hudson.server.log import log
+from modalci.server.log import log
 
 
 class _APIRoute(APIRoute):

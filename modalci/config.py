@@ -7,9 +7,9 @@ from typing import Dict, Optional
 from pydantic import UUID4, BaseModel, Field, StrictInt, StrictStr
 
 
-class HudsonClientConfig(BaseModel):
+class modalciClientConfig(BaseModel):
     config_path: StrictStr = Field(
-        default=f"{os.environ['HOME']}/.hudson/config.json",
+        default=f"{os.environ['HOME']}/.modalci/config.json",
         description="The path to the config file",
     )
     namespace_id: Optional[UUID4] = Field(
@@ -17,7 +17,7 @@ class HudsonClientConfig(BaseModel):
     )
     server_url: StrictStr = Field(
         default="http://localhost:8000",
-        description="The hudson server URL",
+        description="The modalci server URL",
     )
     min_batch_upload_size: StrictInt = Field(
         default=64,
@@ -52,11 +52,11 @@ class HudsonClientConfig(BaseModel):
             json.dump(data, f)
 
 
-config = HudsonClientConfig()
+config = modalciClientConfig()
 
 if "pytest" in "".join(sys.argv):
-    config = HudsonClientConfig(
-        config_path=f"{os.environ['HOME']}/.hudson/config.json.test",
+    config = modalciClientConfig(
+        config_path=f"{os.environ['HOME']}/.modalci/config.json.test",
     )
 
 config.init()

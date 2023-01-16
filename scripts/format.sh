@@ -1,4 +1,4 @@
 #!/bin/sh -ex
 
-black hudson tests docs_src scripts
-ruff hudson tests docs_src scripts --fix
+black modalci tests docs_src scripts
+ruff modalci tests docs_src scripts --fix

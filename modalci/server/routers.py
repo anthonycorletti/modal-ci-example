@@ -7,10 +7,10 @@ from fastapi.templating import Jinja2Templates
 from pydantic import UUID4
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from hudson import __version__
-from hudson._types import HealthResponse, Message
-from hudson.db import psql_db
-from hudson.models import (
+from modalci import __version__
+from modalci._types import HealthResponse, Message
+from modalci.db import psql_db
+from modalci.models import (
     Namespace,
     NamespaceCreate,
     NamespaceRead,
@@ -21,13 +21,13 @@ from hudson.models import (
     TopicCreate,
     TopicRead,
 )
-from hudson.server.log import log
-from hudson.server.services import (
+from modalci.server.log import log
+from modalci.server.services import (
     namespace_service,
     subscriptions_service,
     topics_service,
 )
-from hudson.server.utils import _APIRoute
+from modalci.server.utils import _APIRoute
 
 home_router = APIRouter(route_class=_APIRoute, tags=["home"])
 health_router = APIRouter(route_class=_APIRoute, tags=["health"])

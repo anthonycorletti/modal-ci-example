@@ -5,13 +5,13 @@ from typing import Callable
 from fastapi import FastAPI, Request, Response
 from fastapi.staticfiles import StaticFiles
 
-from hudson import __version__
-from hudson.const import HUDSON
-from hudson.server import routers
+from modalci import __version__
+from modalci.const import modalci
+from modalci.server import routers
 
 os.environ["TZ"] = "UTC"
 
-app = FastAPI(title=HUDSON, version=__version__)
+app = FastAPI(title=modalci, version=__version__)
 app.mount(
     path="/static",
     app=StaticFiles(directory="static"),

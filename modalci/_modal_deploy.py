@@ -1,9 +1,9 @@
 import modal
 from fastapi import FastAPI
 
-from hudson.const import STATIC_PATH, TEMPLATES_PATH
-from hudson.server.main import app
-from hudson.settings import _Env
+from modalci.const import STATIC_PATH, TEMPLATES_PATH
+from modalci.server.main import app
+from modalci.settings import _Env
 
 stub = modal.Stub()
 

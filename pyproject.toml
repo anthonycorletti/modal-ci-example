@@ -6,13 +6,13 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "hudson"
+name = "modalci"
 dynamic = [
     "version",
     "readme",
     "license",
 ]
-description = "Modal-native web framework for data apps, APIs, and more."
+description = "Evaluating modal as a complete replacement for local development, including CI."
 requires-python = ">=3.9"
 dependencies = [
     "fastapi >=0.88.0",
@@ -48,18 +48,13 @@ test = [
     "pytest-cov >=4.0.0",
     "beautifulsoup4 >=4.10.0",
 ]
-doc = [
-    "mkdocs >=1.4.2",
-    "mkdocs-material >=8.5.11",
-    "mdx-include >=1.4.2",
-]
 
 [project.urls]
-Home = "https://www.github.com/anthonycorletti/hudson"
-Documentation = "https://hudson.corletti.xyz"
+Home = "https://www.github.com/anthonycorletti/modal-ci-example"
+Documentation = "https://www.github.com/anthonycorletti/modal-ci-example/blob/main/README.md"
 
 [project.scripts]
-hudson = "hudson.cli:app"
+modalci = "modalci.cli:app"
 
 [tool.ruff]
 line-length = 88
@@ -83,4 +78,4 @@ extend-ignore = [
 ]
 
 [tool.setuptools.dynamic.version]
-attr = "hudson.__version__"
+attr = "modalci.__version__"

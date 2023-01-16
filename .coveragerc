@@ -1,8 +1,7 @@
 [run]
 source =
-    hudson
+    modalci
     tests
-    docs_src
 
 concurrency =
     thread
@@ -11,6 +10,6 @@ concurrency =
 
 omit =
     *__init__.py
-    hudson/_modal*
+    modalci/_modal*
 
 parallel = True

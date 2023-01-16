@@ -7,7 +7,7 @@ from sqlalchemy import Column, DateTime, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlmodel import Field, ForeignKey, Relationship, SQLModel
 
-from hudson._types import DeliveryType
+from modalci._types import DeliveryType
 
 
 class TimestampsMixin(BaseModel):
@@ -48,7 +48,7 @@ class BaseNamespace(SQLModel):
     class Config:
         schema_extra = {
             "example": {
-                "name": "hudson",
+                "name": "modalci",
             }
         }
 

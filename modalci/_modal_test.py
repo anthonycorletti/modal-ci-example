@@ -3,30 +3,40 @@ import os
 import modal
 import pytest
 
-from hudson.const import STATIC_PATH, TEMPLATES_PATH
-from hudson.settings import _Env
+from modalci.const import STATIC_PATH, TEMPLATES_PATH
+from modalci.settings import _Env
 
 stub = modal.Stub("ci")
+
 _s = _Env(_env_file=".env.test")
 secrets = [
     modal.Secret(_s.to_modal_secret()),
-    modal.Secret.from_name("hudson-test-psql-url"),
+    modal.Secret.from_name("modalci-test-psql-url"),
 ]
 image = modal.Image.debian_slim().pip_install_from_pyproject(
     "pyproject.toml", optional_dependencies=["test", "dev"]
 )
 
 
+def _modalinclude(path: str) -> bool:
+    return path.endswith(".coveragerc")
+
+
 @stub.function(
     image=image,
     mounts=[
         modal.Mount(
-            local_dir=f"{os.environ['HOME']}/hudson/hudson",
-            remote_dir="/root/app/hudson",
+            local_dir=f"{os.environ['HOME']}/modalci/modalci",
+            remote_dir="/root/modalci",
         ),
         modal.Mount(
-            local_dir=f"{os.environ['HOME']}/hudson/tests",
-            remote_dir="/root/app/tests",
+            local_dir=f"{os.environ['HOME']}/modalci/tests",
+            remote_dir="/root/tests",
+        ),
+        modal.Mount(
+            local_dir=f"{os.environ['HOME']}/modalci/",
+            remote_dir="/root",
+            condition=_modalinclude,
         ),
         modal.Mount(
             "/root/static",
@@ -42,15 +52,13 @@ image = modal.Image.debian_slim().pip_install_from_pyproject(
 def _pytest_modal() -> int:
     return pytest.main(
         [
-            "/root/app/tests",
-            "--cov=hudson",
+            "--cov=modalci",
             "--cov=tests",
             "--cov-report=term-missing",
             "--cov-report=xml",
-            "-o",
-            " console_output_style=progress",
             "--disable-warnings",
             "--cov-fail-under=100",
+            "--asyncio-mode=auto",
         ]
     )
 
