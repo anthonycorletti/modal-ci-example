@@ -18,7 +18,7 @@ image = modal.Image.debian_slim().pip_install_from_pyproject(
 
 
 def _modalinclude(path: str) -> bool:
-    return path.endswith(".coveragerc")
+    return path.endswith((".coveragerc", "const.py", "settings.py"))
 
 
 @stub.function(
