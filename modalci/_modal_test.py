@@ -25,10 +25,11 @@ def _modalinclude(path: str) -> bool:
 @stub.function(
     image=image,
     mounts=[
-        modal.Mount(
-            local_dir=f"{os.environ['HOME']}/modal-ci-example/modalci",
-            remote_dir="/root/modalci",
-        ),
+        # Dont need this as modal will mount the modalci package by default
+        # modal.Mount(
+        #     local_dir=f"{os.environ['HOME']}/modal-ci-example/modalci",
+        #     remote_dir="/root/modalci",
+        # ),
         modal.Mount(
             local_dir=f"{os.environ['HOME']}/modal-ci-example/tests",
             remote_dir="/root/tests",

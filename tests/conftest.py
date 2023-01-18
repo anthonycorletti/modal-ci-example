@@ -22,13 +22,6 @@ def runner() -> Generator:
     yield runner
 
 
-@pytest.fixture(scope="session")
-def event_loop(request: Request) -> Generator:
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
 @pytest_asyncio.fixture(scope="session")
 async def client() -> AsyncGenerator:
     async with AsyncClient(
@@ -36,6 +29,13 @@ async def client() -> AsyncGenerator:
         base_url="http://testserver:8001",
     ) as client:
         yield client
+
+
+@pytest.fixture(scope="session", autouse=True)
+def event_loop(request: Request) -> Generator:
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
 
 
 @pytest_asyncio.fixture(scope="function", autouse=True)
