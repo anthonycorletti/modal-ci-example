@@ -5,8 +5,8 @@ from typing import Callable
 from fastapi import FastAPI, Request, Response
 from fastapi.staticfiles import StaticFiles
 
+from const import modalci
 from modalci import __version__
-from modalci.const import modalci
 from modalci.server import routers
 
 os.environ["TZ"] = "UTC"

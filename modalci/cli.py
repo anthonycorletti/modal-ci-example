@@ -1,8 +1,8 @@
 import typer
 import uvicorn
 
+from const import APP_IMPORT_STRING, modalci
 from modalci import __version__
-from modalci.const import APP_IMPORT_STRING, modalci
 
 name = f"{modalci} {__version__}"
 

@@ -8,7 +8,7 @@ from sqlmodel.ext.asyncio.session import AsyncEngine
 
 from alembic import context
 from modalci.models import Namespace, Topic  # noqa
-from modalci.settings import env
+from settings import env
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

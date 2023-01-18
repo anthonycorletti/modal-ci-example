@@ -7,7 +7,7 @@ from typing import Dict, Optional
 from pydantic import UUID4, BaseModel, Field, StrictInt, StrictStr
 
 
-class modalciClientConfig(BaseModel):
+class ModalciClientConfig(BaseModel):
     config_path: StrictStr = Field(
         default=f"{os.environ['HOME']}/.modalci/config.json",
         description="The path to the config file",
@@ -52,11 +52,10 @@ class modalciClientConfig(BaseModel):
             json.dump(data, f)
 
 
-config = modalciClientConfig()
+config = ModalciClientConfig()
 
-if "pytest" in "".join(sys.argv):
-    config = modalciClientConfig(
-        config_path=f"{os.environ['HOME']}/.modalci/config.json.test",
-    )
+if "pytest" in "".join(sys.argv):  # pragma: no cover
+    config_path = f"{os.environ['HOME']}/.modalci/config.json.test"
+    config = ModalciClientConfig(config_path=config_path)
 
 config.init()

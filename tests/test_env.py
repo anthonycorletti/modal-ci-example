@@ -1,4 +1,4 @@
-from modalci.settings import _Env
+from settings import _Env
 
 
 def test_env_conversion() -> None:

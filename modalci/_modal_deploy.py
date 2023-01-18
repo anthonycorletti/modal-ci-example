@@ -1,9 +1,9 @@
 import modal
 from fastapi import FastAPI
 
-from modalci.const import STATIC_PATH, TEMPLATES_PATH
+from const import STATIC_PATH, TEMPLATES_PATH
 from modalci.server.main import app
-from modalci.settings import _Env
+from settings import _Env
 
 stub = modal.Stub()
 

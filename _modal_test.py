@@ -3,8 +3,7 @@ import os
 import modal
 import pytest
 
-from modalci.const import STATIC_PATH, TEMPLATES_PATH
-from modalci.settings import _Env
+from settings import _Env
 
 stub = modal.Stub("ci")
 
@@ -26,10 +25,10 @@ def _modalinclude(path: str) -> bool:
     image=image,
     mounts=[
         # Dont need this as modal will mount the modalci package by default
-        # modal.Mount(
-        #     local_dir=f"{os.environ['HOME']}/modal-ci-example/modalci",
-        #     remote_dir="/root/modalci",
-        # ),
+        modal.Mount(
+            local_dir=f"{os.environ['HOME']}/modal-ci-example/modalci",
+            remote_dir="/root/modalci",
+        ),
         modal.Mount(
             local_dir=f"{os.environ['HOME']}/modal-ci-example/tests",
             remote_dir="/root/tests",
@@ -40,12 +39,12 @@ def _modalinclude(path: str) -> bool:
             condition=_modalinclude,
         ),
         modal.Mount(
-            "/root/static",
-            local_dir=STATIC_PATH,
+            remote_dir="/root/static",
+            local_dir=f"{os.environ['HOME']}/modal-ci-example/static",
         ),
         modal.Mount(
-            "/root/templates",
-            local_dir=TEMPLATES_PATH,
+            remote_dir="/root/templates",
+            local_dir=f"{os.environ['HOME']}/modal-ci-example/templates",
         ),
     ],
     secrets=secrets,
