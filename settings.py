@@ -23,7 +23,6 @@ class _Env(BaseSettings):
         description="Log level.",
     )
     PSQL_URL: str = Field(
-        "postgresql+asyncpg://modalci:modalci@localhost:5432/modalci",
         env="PSQL_URL",
         description="The PSQL database URL.",
     )
